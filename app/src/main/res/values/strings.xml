@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ABCSO Remote Pay</string>
+    <string name="action_settings">Settings</string>
+    <string name="amount_text_error">Input should be equal &amp; less than original value.</string>
+</resources>

@@ -1,0 +1,14 @@
+{
+  "client_id" : "d6d764a7-baec-453f-b2a3-3a39777d88b3",
+  "authorization_user_agent" : "WEBVIEW",
+  "redirect_uri" : "msauth://com.safeway.postest3/hFUkSUjSCCZlevy%2BBajMQJEYQCk%3D",
+  "account_mode" : "SINGLE",
+  "broker_redirect_uri_registered": true,
+  "authorities" : [
+    {
+      "type": "AAD",
+      "tenantId": "b7f604a0-00a9-4188-9248-42f3a5aac2e9",
+      "authority_url": "https://login.microsoftonline.com/b7f604a0-00a9-4188-9248-42f3a5aac2e9"
+    }
+  ]
+}

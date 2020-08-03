@@ -1,0 +1,8 @@
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="cta_button_width">328dp</dimen>
+    <dimen name="cta_button_height">58dp</dimen>
+
+    <dimen name="trash_background_size">70dp</dimen>
+</resources>

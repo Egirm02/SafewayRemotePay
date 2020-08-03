@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="green">#1fff97</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="blue">#1c79e8</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="black">#000000</color>
+    <color name="white_two">#dedede</color>
+    <color name="white">#ffffff</color>
+    <color name="transparent">#B3000000</color>
+    <color name="gray">#808080</color>
+    <color name="red">#ff0000</color>
+    <color name="lipstick">#e41720</color>
+    <color name="loaderColor">#cc191b</color>
+    <color name="colorUnSelected">#d1d1d1</color>E5E5E5
+    <color name="colorLightgray">#E5E5E5</color>
+    <color name="colorOrange">#EC7171</color>
+    <color name="brown_grey">#a7a7a7</color>
+    <color name="greyish">#a7a7a7</color>
+    <color name="rosy_pink">#ec5c62</color>
+</resources>

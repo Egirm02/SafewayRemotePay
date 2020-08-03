@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:text="Split payment"
+        android:textAllCaps="true"
+        android:textStyle="bold" />
+
+
+
+    <TextView
+        android:id="@+id/total_balance_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_margin="20dp"
+        android:layout_below="@+id/title"
+        android:text="Total Amount: "
+        android:textAllCaps="true"
+        android:textStyle="bold" />
+
+
+    <TextView
+        android:id="@+id/total_balance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_margin="20dp"
+        android:layout_below="@+id/title"
+        android:layout_toRightOf="@+id/total_balance_title"
+         />
+
+
+    <ImageView
+        android:id="@+id/cross"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/total_balance"
+        android:layout_margin="7dp"
+        android:visibility="invisible"
+        android:src="@drawable/ic_highlight_off_red_24dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <RelativeLayout
+        android:id="@+id/payment_layout"
+        android:layout_below="@+id/total_balance"
+        android:layout_margin="7dp"
+        android:layout_toLeftOf="@+id/cross"
+        android:background="@drawable/border_drawable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+<Button
+    android:id="@+id/increment"
+    android:text="+"
+    android:layout_alignParentEnd="true"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/sizeValue"
+            android:layout_toLeftOf="@+id/increment"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/decrement"
+            android:text="-"
+            android:layout_toLeftOf="@+id/sizeValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+        <TextView
+            android:id="@+id/paymentTxt"
+            android:layout_toLeftOf="@+id/decrement"
+            android:layout_centerVertical="true"
+            android:paddingLeft="7dp"
+            android:text="Payments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_split"
+        android:layout_margin="7dp"
+        android:descendantFocusability="beforeDescendants"
+        android:layout_below="@+id/payment_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</RelativeLayout>

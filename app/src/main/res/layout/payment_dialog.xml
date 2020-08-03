@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/border_drawable"
+        android:layout_marginBottom="10dp">
+
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:src="@drawable/close"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="15dp"
+            android:id="@+id/cancel_button"
+            android:layout_gravity="right"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Payment Options"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginBottom="20dp"/>
+
+
+        <RelativeLayout
+            android:id="@+id/ll_EBT_payment"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:background="@color/colorLightgray"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="10dp">
+
+            <CheckBox
+                android:id="@+id/rb_EBT_select"
+                android:duplicateParentState="true"
+                android:enabled="false"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/rb_EBT_select"
+                android:text="Snap/EBT Card"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/ebtEditLayout"
+                android:gravity="center"
+                android:textSize="17sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:layout_weight="1"/>
+
+            <LinearLayout
+                android:id="@+id/ebtEditLayout"
+                android:background="@drawable/edittext_border"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginEnd="25dp"
+                android:visibility="invisible"
+                android:minWidth="100dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/preText1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="5dp"
+                    android:text="$"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/tv_ebt_dialog"
+                    android:visibility="visible"
+                    android:layout_alignParentEnd="true"
+                    android:maxLength="7"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:background="@android:color/transparent"
+                    android:text="0.00"
+                    android:padding="7dp"
+                    android:layout_gravity="center_vertical"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"/>
+
+
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tv_ebt_error"
+            android:text="@string/amount_text_error"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:gravity="right"
+            android:visibility="invisible"
+            android:textColor="@color/loaderColor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <RelativeLayout
+            android:id="@+id/ll_EFT_amaount"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:background="@color/colorLightgray"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp">
+
+            <CheckBox
+                android:id="@+id/rb_EFT_select"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:duplicateParentState="true"
+                android:layout_centerVertical="true"
+                android:gravity="center"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Credit/Debit Card"
+                android:layout_toRightOf="@+id/rb_EFT_select"
+                android:layout_toLeftOf="@+id/eftEditLayout"
+                android:layout_centerVertical="true"
+                android:gravity="center"
+                android:textSize="17sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:layout_weight="1"/>
+
+            <LinearLayout
+                android:id="@+id/eftEditLayout"
+                android:background="@drawable/edittext_border"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="25dp"
+                android:layout_alignParentEnd="true"
+                android:visibility="invisible"
+                android:minWidth="100dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+            <TextView
+                android:text="$"
+                android:id="@+id/preText2"
+                android:layout_marginLeft="5dp"
+                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:layout_gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <EditText
+                android:id="@+id/tv_eft_dialog"
+                android:visibility="visible"
+                android:layout_toRightOf="@+id/preText2"
+                android:maxLength="7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:background="@android:color/transparent"
+                android:text="0.00"
+                android:padding="7dp"
+                android:layout_gravity="center_vertical"
+                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tv_eft_error"
+            android:visibility="invisible"
+            android:text="@string/amount_text_error"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:gravity="right"
+            android:textColor="@color/loaderColor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/btn_PaymentAuthorize_dialog"
+            android:layout_gravity="center"
+            android:text="Authorize"
+            android:layout_centerInParent="true"
+            android:layout_width="250dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="15dp"
+            android:layout_alignParentBottom="true"
+            android:enabled="false"
+            android:background="@color/gray"
+            android:textColor="@color/white"
+            android:textSize="16dp"
+            android:layout_marginTop="10dp"/>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
