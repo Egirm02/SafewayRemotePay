@@ -96,20 +96,28 @@ public class Home extends AppCompatActivity {
 //                Intent intent = new Intent(getBaseContext(), CartActivity.class);
 //                startActivity(intent);
                 //Real
-                if (etStoreId.getText().toString().equals("")) {
-                    Toast.makeText(Home.this, "Please set store number first", Toast.LENGTH_SHORT).show();
-                } else {
-                    IntentIntegrator integrator = new IntentIntegrator(Home.this);
-                    integrator.setCaptureActivity(CaptureActivityPortrait.class);
-                    integrator.setOrientationLocked(false);
-                    integrator.initiateScan();
-                }
+//                if (etStoreId.getText().toString().equals("")) {
+//                    Toast.makeText(Home.this, "Please set store number first", Toast.LENGTH_SHORT).show();
+//                } else {
+//                    IntentIntegrator integrator = new IntentIntegrator(Home.this);
+//                    integrator.setCaptureActivity(CaptureActivityPortrait.class);
+//                    integrator.setOrientationLocked(false);
+//                    integrator.initiateScan();
+//                }
                 //Demo
 //                String retrieve = "100019900017" ;// result.getContents().toString();
 //                if(retrieve.length()> 12){
-//                    retrieveOrder(retrieve.substring(0,12));
-//                }else{retrieveOrder(retrieve);}
-                //    loadingLayout.setVisibility(View.VISIBLE);
+//                    retrieveOrder(retrieve.substring(0,12),etStoreId.getText().toString());
+//                }else{retrieveOrder(retrieve,etStoreId.getText().toString());}
+//                    loadingLayout.setVisibility(View.VISIBLE);
+                //Demo2
+                loadingLayout.setVisibility(View.GONE);
+               // Toast.makeText(Home.this, "Terminal: " + receiptResponse.getResponse().getTerminalNumber(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getBaseContext(), CartActivity.class);
+                intent.putExtra("guid", "00");
+                intent.putExtra("storeId", "00");
+                intent.putExtra("orderId", "00");
+                startActivity(intent);
             }
         });
         showClubCard.setOnClickListener(new View.OnClickListener() {
@@ -278,7 +286,7 @@ public class Home extends AppCompatActivity {
         long time = System.currentTimeMillis();
         long expireTime = System.currentTimeMillis() + 2000000;
         Log.d(TAG, "getReceipt: " + "time " + time + "exptime " + expireTime);
-
+//TODO fix expire time
         apiService.getReceipt(orderId, storeId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

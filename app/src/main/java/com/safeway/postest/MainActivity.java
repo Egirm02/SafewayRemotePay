@@ -10,12 +10,14 @@ import androidx.viewpager.widget.ViewPager;
 import android.accounts.Account;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
 
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -52,6 +54,7 @@ import com.clover.sdk.v3.connector.IPaymentConnectorListener;
 import com.clover.sdk.v3.order.LineItem;
 import com.clover.sdk.v3.order.Order;
 import com.clover.sdk.v3.order.OrderConnector;
+import com.clover.sdk.v3.order.OrderContract;
 import com.clover.sdk.v3.payments.CardTransaction;
 import com.clover.sdk.v3.payments.CardType;
 import com.clover.sdk.v3.payments.Payment;
@@ -454,19 +457,29 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
                     voidEBTPayment.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            payButton.setEnabled(false);
-                            payButton.setBackgroundColor(getResources().getColor(R.color.greyish));
-                            orderProcessed = false;
-                            Log.d(TAG, "onClick: Void" + "pressed void");
-                            //NewEBT_FlowFlag
-                           // voidPayment(payment.getId(), payment.getOrder().getId());
-                            try {
-                                if(paymentEBT!=null){
-                                    voidPayment(paymentEBT.getId(), paymentEBT.getOrder().getId());
+                            sync();
+                            loadingLayout.setVisibility(View.VISIBLE);
+                            final Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    payButton.setEnabled(false);
+                                    payButton.setBackgroundColor(getResources().getColor(R.color.greyish));
+                                    orderProcessed = false;
+                                    Log.d(TAG, "onClick: Void" + "pressed void");
+                                    loadingLayout.setVisibility(View.GONE);
+                                    //NewEBT_FlowFlag
+                                    // voidPayment(payment.getId(), payment.getOrder().getId());
+                                    try {
+                                        if (paymentEBT != null) {
+                                            voidPayment(paymentEBT.getId(), paymentEBT.getOrder().getId());
+                                        }
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    } //Do something after 100ms
                                 }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                            }, 6000);
+
                         }
                     });
 
@@ -660,6 +673,15 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
         });
 
        // viewCart("default","9879");
+    }
+
+    public void sync(){
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        ContentResolver.requestSync(account, OrderContract.AUTHORITY, bundle);
+        ContentResolver.requestSync(account, "com.clover.transactions", bundle);
+
     }
 
 
@@ -945,6 +967,7 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
                 orderConnector.addCustomLineItem(createdOrder.getId(), new LineItem("{ \"name\": \"EBT Sale\", \"price\": "+ebt_amount+" }"), false);
                 // Since a canceled payment would leave this order open, you may want to more tightly manage the orders to prevent a build up of open orders.
                 Intent ebtIntent = new Intent(Intents.ACTION_MERCHANT_TENDER); // This intent action specifies that we want to start a merchant tender
+                ebtIntent.setPackage("com.clover.ebt"); //This calls the ebt app directly
                 ebtIntent.putExtra(Intents.EXTRA_AMOUNT, ebt_amount); // The amount you're requesting for the transaction
                 ebtIntent.putExtra(Intents.EXTRA_ORDER_ID, createdOrder.getId()); // The order the successful transaction should be associated with
                 ebtIntent.putExtra(Intents.EXTRA_CUSTOMER_TENDER, "EBT"); // This specifies the tender to be used. In our case, EBT
@@ -1000,7 +1023,7 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
 //            recalculateEBT(recalculate);
 //
 //        }
-
+        sync();
         Double EBTpaid = Double.valueOf(amount)/100;
         round(EBTpaid, 2);
         String strDouble = String.format("%.2f",total);
@@ -1250,6 +1273,7 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
                             true,
                             response.getPayment().getCreatedTime()
                             );
+                    sync();
                 }else if(authorizeEBT == false){
                     handleEFTPaymentResponse(response.getPayment().getCardTransaction().getFirst6()+"0000"+response.getPayment().getCardTransaction().getLast4(),
                             response.getPayment().getCardTransaction().getCardType().name(),

@@ -133,12 +133,12 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
             @Override
             public void onClick(View view) {
              // getCheckout(getstoreId,getguid,getguid);
-             //  checkoutDemo();
+               checkoutDemo();
                 if(deleteItemPressed || needRecalculate){
-                    getCheckout(getstoreId,getguid,getguid,getOrderId);
+           //         getCheckout(getstoreId,getguid,getguid,getOrderId);
                 }else{
-                  //  checkoutDemo();
-                    needRecalculate =true;
+                    checkoutDemo();
+           //         needRecalculate =true;
                     getReceipt(getOrderId,getstoreId);
                 }
 
