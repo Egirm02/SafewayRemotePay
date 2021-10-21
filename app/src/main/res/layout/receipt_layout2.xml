@@ -27,7 +27,7 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="80dp"
-            android:src="@drawable/albertsons1"
+            android:src="@drawable/albertsons_co_logo"
             android:layout_marginTop="50dp"/>
 
 

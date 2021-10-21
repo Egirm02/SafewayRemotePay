@@ -78,52 +78,78 @@ public interface Service {
     })
     Observable<BaseResponse> addItemToCart(@Query("clientId") String clientId, @Body ItemRequest itemRequest, @Header("storeid") String storeid);
 
+    //cloverPaymentProd/removeItems
+    //7024f91451d74393bbf891483210dc28
+    //cloverPaymentDev/removeItems
+    //2f480da761e145f081a04a1e8ac0f59a
     @PUT("cloverPaymentDev/removeItems")
     @Headers({"Accept: application/json",
             "Content-Type: application/json",
             "Ocp-Apim-Subscription-Key: 2f480da761e145f081a04a1e8ac0f59a",
-            })
-    Completable deleteItemFromCart(@Body ItemIdRequest itemIds, @Header("storeid") String storeid,@Header("guid") String guid,@Header("orderId") String orderId,@Header("add") Boolean add);
+    })
+    Completable deleteItemFromCart(@Body ItemIdRequest itemIds, @Header("storeid") String storeid, @Header("guid") String guid, @Header("orderId") String orderId, @Header("add") Boolean add);
 
-//    @GET("scanandgoemp/viewCart")
+   /* //    @GET("scanandgoemp/viewCart")
 //    @Headers({"Accept: application/json",
 //            "Content-Type: application/json",
 //            "Ocp-Apim-Subscription-Key: 78ae78149bff429789d33a7b15c32437",
 //            "GUID:200-160-1531871357979",
 //
 //    })
-//    Observable<BaseResponse<Cart>> getCart(@Query("clientId") String clientId, @Header("storeid") String storeid);
-    @GET("cloverPaymentDev/viewCart")
-    @Headers({"Accept: application/json",
-            "Content-Type: application/json",
-            "Ocp-Apim-Subscription-Key: 2f480da761e145f081a04a1e8ac0f59a",
+//    Observable<BaseResponse<Cart>> getCart(@Query("clientId") String clientId, @Header("storeid") String storeid);*/
+   //cloverPaymentProd/viewCart
+   //7024f91451d74393bbf891483210dc28
+   //cloverPaymentDev/viewCart
+   //2f480da761e145f081a04a1e8ac0f59a
+   @GET("cloverPaymentDev/viewCart")
+   @Headers({"Accept: application/json",
+           "Content-Type: application/json",
+           "Ocp-Apim-Subscription-Key: 2f480da761e145f081a04a1e8ac0f59a",
 
-    })
+   })
     Observable<BaseResponse<Cart>> getCart(@Header("guid") String guid, @Header("storeid") String storeid, @Header("orderId") String orderId);
 
+    //cloverPaymentProd/getReceipt
+    //7024f91451d74393bbf891483210dc28
+    //cloverPaymentDev/getReceipt
+    //2f480da761e145f081a04a1e8ac0f59a
     @GET("cloverPaymentDev/getReceipt")
     @Headers({"Accept: application/json",
             "Content-Type: application/json",
             "Ocp-Apim-Subscription-Key: 2f480da761e145f081a04a1e8ac0f59a",
 
-    })
-    Observable<BaseResponse<Data>> getReceipt(@Query("orderId") String orderId,@Header("storeid") String storeId);
 
+    })
+    Observable<BaseResponse<Data>> getReceipt(@Query("orderId") String orderId, @Header("storeid") String storeId);
+
+    //cloverBackendProd/cloverCheckOutCart
+    //7024f91451d74393bbf891483210dc28
+    //cloverBackendDev/cloverCheckOutCart
+    //2f480da761e145f081a04a1e8ac0f59a
     @GET("cloverBackendDev/cloverCheckOutCart")
     @Headers({"Accept: application/json",
             "Content-Type: application/json",
             "Ocp-Apim-Subscription-Key: 2f480da761e145f081a04a1e8ac0f59a",
 
     })
-    Observable<BaseResponse<Data2>> getcloverCheckOut(@Header("storeid") String storeId,@Header("guid") String guid,@Header("clubcard_nbr") String clubcard_nbr,@Header("orderId") String orderId);
+    Observable<BaseResponse<Data2>> getcloverCheckOut(@Header("storeid") String storeId, @Header("guid") String guid, @Header("clubcard_nbr") String clubcard_nbr, @Header("orderId") String orderId);
 
+    //cloverBackendProd/retrieveOrder
+    //7024f91451d74393bbf891483210dc28
+    //cloverBackendDev/retrieveOrder
+    //2f480da761e145f081a04a1e8ac0f59a
     @GET("cloverBackendDev/retrieveOrder")
     @Headers({"Accept: application/json",
             "Content-Type: application/json",
             "Ocp-Apim-Subscription-Key: 2f480da761e145f081a04a1e8ac0f59a",
-    })
-    Observable<BaseResponse<Data3>> getRetrieveOrder(@Header("suspend_barcode") String orderId,@Header("storeid") String storeId);
 
+    })
+    Observable<BaseResponse<Data3>> getRetrieveOrder(@Header("suspend_barcode") String orderId, @Header("storeid") String storeId);
+
+    //cloverBackendProd/recalculateTransaction
+    //7024f91451d74393bbf891483210dc28
+    //cloverBackendDev/recalculateTransaction
+    //2f480da761e145f081a04a1e8ac0f59a
     @POST("cloverBackendDev/recalculateTransaction")
     @Headers({"Accept: application/json",
             "Content-Type: application/json",
@@ -131,6 +157,10 @@ public interface Service {
     })
     Observable<BaseResponse> recalculateCall(@Body RecalculateTransaction recalculateRequest);
 
+    //cloverBackendProd/finalizeSplitTransaction
+    //7024f91451d74393bbf891483210dc28
+    //cloverBackendDev/finalizeSplitTransaction
+    //2f480da761e145f081a04a1e8ac0f59a
     @POST("cloverBackendDev/finalizeSplitTransaction")
     @Headers({"Accept: application/json",
             "Content-Type: application/json",
@@ -138,6 +168,10 @@ public interface Service {
     })
     Observable<BaseResponse> finalizeCall(@Body FinalizeSplitTransaction finalizeSplitTransaction);
 
+    //cloverPaymentProd/refundToCOA
+    //7024f91451d74393bbf891483210dc28
+    //cloverPaymentDev/refundToCOA
+    //2f480da761e145f081a04a1e8ac0f59a
     @POST("cloverPaymentDev/refundToCOA")
     @Headers({"Accept: application/json",
             "Content-Type: application/json",

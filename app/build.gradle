@@ -17,7 +17,7 @@ android {
         applicationId "com.safeway.postest3"
         minSdkVersion 17
         targetSdkVersion 24
-        versionCode 23
+        versionCode 24
         versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
