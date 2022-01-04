@@ -18,6 +18,9 @@ public class BaseResponse<T> implements Parcelable {
     @SerializedName("message")
     private String message;
 
+    @SerializedName("order_id")
+    private String orderId;
+
     @SerializedName("errors")
     private List<ErrorMessage> errorMessage;
 
@@ -25,6 +28,7 @@ public class BaseResponse<T> implements Parcelable {
     protected BaseResponse(Parcel in) {
         ack = in.readString();
         message = in.readString();
+        orderId = in.readString();
     }
 
     public static final Creator<BaseResponse> CREATOR = new Creator<BaseResponse>() {
@@ -48,6 +52,7 @@ public class BaseResponse<T> implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(ack);
         parcel.writeString(message);
+        parcel.writeString(orderId);
     }
 
     public String getAck() {
@@ -72,6 +77,14 @@ public class BaseResponse<T> implements Parcelable {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 
     public List<ErrorMessage> getErrorMessage() {

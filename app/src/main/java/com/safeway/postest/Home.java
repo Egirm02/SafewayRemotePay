@@ -55,7 +55,8 @@ public class Home extends AppCompatActivity {
     EditText etClubcard;
     EditText etStoreId;
     String retrieveOrder;
-    String storeId;
+    //TODO MAKE STORE ID DYNAMIC
+    String storeId = "1600";
     Button btn_submit_recall;
     ConstraintLayout loadingLayout;
     double longitude;
@@ -113,6 +114,17 @@ public class Home extends AppCompatActivity {
                 //Demo2
                 loadingLayout.setVisibility(View.GONE);
                // Toast.makeText(Home.this, "Terminal: " + receiptResponse.getResponse().getTerminalNumber(), Toast.LENGTH_SHORT).show();
+
+                try {
+                    if (etStoreId.getText() != null) {
+
+                        storeId = etStoreId.getText().toString();
+                        Util.saveString(Home.this, Util.STORE_ID,  storeId);
+
+                    }} catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 Intent intent = new Intent(getBaseContext(), CartActivity.class);
                 intent.putExtra("guid", "00");
                 intent.putExtra("storeId", "00");
@@ -158,7 +170,7 @@ public class Home extends AppCompatActivity {
         //understand the blank
         storeId = Util.getString(getApplicationContext(), Util.STORE_ID, "");
         if (userName != null) {
-            welcomeUserName.setText("Welcome Associate, " + userName);
+            welcomeUserName.setText("Welcome associate, " + userName);
         }
         if (storeId != null) {
             etStoreId.setText(storeId);

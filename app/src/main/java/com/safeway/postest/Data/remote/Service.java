@@ -7,10 +7,13 @@ import com.safeway.postest.Data.model.BaseResponse;
 import com.safeway.postest.Data.model.COA_Request;
 import com.safeway.postest.Data.model.COA_Response;
 import com.safeway.postest.Data.model.Cart;
+import com.safeway.postest.Data.model.CheckoutPharmacy;
 import com.safeway.postest.Data.model.FinalizeSplitTransaction;
 import com.safeway.postest.Data.model.Item;
+import com.safeway.postest.Data.model.ItemDetail2;
 import com.safeway.postest.Data.model.ItemIdRequest;
 import com.safeway.postest.Data.model.ItemRequest;
+import com.safeway.postest.Data.model.TransactionDetails;
 import com.safeway.postest.Data.model.profile.DataProfile;
 import com.safeway.postest.Data.model.profile.ProfileRequest;
 import com.safeway.postest.Data.model.ReceiptResponse;
@@ -122,6 +125,19 @@ public interface Service {
     })
     Observable<BaseResponse<Data>> getReceipt(@Query("orderId") String orderId, @Header("storeid") String storeId);
 
+    //scanandgoprod/getReceipt
+    //7024f91451d74393bbf891483210dc28
+    //scanandgodev/getReceipt
+    //2adea0f3833f433984136e291fbab38b
+    @GET("scanandgoprod/getReceipt")
+    @Headers({"Accept: application/json",
+            "Content-Type: application/json",
+            "Ocp-Apim-Subscription-Key: 7024f91451d74393bbf891483210dc28",
+            "x-swy-client-id: 3pl"
+
+    })
+    Observable<BaseResponse<Data>> getReceiptPharmacy(@Query("orderId") String orderId);
+
     //cloverBackendProd/cloverCheckOutCart
     //7024f91451d74393bbf891483210dc28
     //cloverBackendDev/cloverCheckOutCart
@@ -167,6 +183,19 @@ public interface Service {
             "Ocp-Apim-Subscription-Key: 2f480da761e145f081a04a1e8ac0f59a"
     })
     Observable<BaseResponse> finalizeCall(@Body FinalizeSplitTransaction finalizeSplitTransaction);
+
+    //scanandgoprod/vendor/checkout
+    //7024f91451d74393bbf891483210dc28
+    //scanandgodev/vendor/checkout
+    //2adea0f3833f433984136e291fbab38b
+    @POST("scanandgoprod/vendor/checkout")
+    @Headers({"Accept: application/json",
+            "Content-Type: application/json",
+            "Ocp-Apim-Subscription-Key: 7024f91451d74393bbf891483210dc28",
+            "x-swy-client-id: 3pl",
+            "vendor: pharmacy"
+    })
+    Observable<BaseResponse> pharmacyFinalizeCall(@Body CheckoutPharmacy checkoutPharmacy);
 
     //cloverPaymentProd/refundToCOA
     //7024f91451d74393bbf891483210dc28

@@ -79,10 +79,10 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
         scanButton = findViewById(R.id.Img_btn_scanBarcodeBtn);
         checkoutButton= findViewById(R.id.btn_checkout);
         checkoutLayout=findViewById(R.id.ll_checkout);
-        cartRecyclerView = findViewById(R.id.rv_cart);
-        cartRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        cartRecyclerViewAdapter = new CartRecyclerViewAdapter(this);
-        cartRecyclerView.setAdapter(cartRecyclerViewAdapter);
+//        cartRecyclerView = findViewById(R.id.rv_cart);
+//        cartRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+   //        cartRecyclerViewAdapter = new CartRecyclerViewAdapter(this);
+   //     cartRecyclerView.setAdapter(cartRecyclerViewAdapter);
         loadingLayout = findViewById(R.id.loadingLayout);
         scanClubCard = findViewById(R.id.btn_Scan_club_card);
         etClubcard = findViewById(R.id.et_Club_card_input);
@@ -96,7 +96,7 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
 //            if (getViewCart.equals("true")){
 //                viewCart("default","9879");
 //            }
-            viewCart(getguid,getstoreId,getOrderId);
+          //  viewCart(getguid,getstoreId,getOrderId);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -110,16 +110,16 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
 //            e.printStackTrace();
 //        }
 
-        cartRecyclerView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                  //  viewCart("default","9879");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+//        cartRecyclerView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                try {
+//                  //  viewCart("default","9879");
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -139,7 +139,7 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
                 }else{
                     checkoutDemo();
            //         needRecalculate =true;
-                    getReceipt(getOrderId,getstoreId);
+                 //   getReceipt(getOrderId,getstoreId);
                 }
 
                 loadingLayout.setVisibility(View.VISIBLE);
@@ -327,6 +327,8 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
                                 cartTotal.setText("Checkout for total");
                             }else{
                                 cartTotal.setText("Total: $"+String.format("%.2f",cartBaseResponse.getResponse().getTotalPrice()));
+                                cartTotal.setText("Total: $"+"129.00");
+
                             }
 
                             estTotal = String.valueOf(cartBaseResponse.getResponse().getTotalPrice());
@@ -465,12 +467,12 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
     public void checkoutDemo(){
         Toast.makeText(CartActivity.this, "Terminal: "+"123",Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(getBaseContext(),MainActivity.class);
-        intent.putExtra("checkoutTotal","140.18");
-        intent.putExtra("subTotal","148.9");
-        intent.putExtra("taxTotal","8.78");
-        intent.putExtra("appliedDiscountsTotal","17.5");
-        intent.putExtra("ebtTotal","78.03");
-        intent.putExtra("receipt","\\r\\n                                      \\r\\nTHANKS FOR SHOPPING SAFEWAY U CHECKOUT\\r\\n\\r\\n        SIG COFFEE COLD         1.99 S\\r\\n        CRV SFTDK SNGL NTX      0.05 S\\r\\n        TAX                     0.00  \\r\\n   **** BALANCE                 2.04  \\r\\n                                      \\r\\n06/05/20 03:06 9879 196 878 8833      \\r\\n                                      \\r\\n--------------------------------------\\r\\nYOUR CASHIER TODAY WAS SCAN AND GO    \\r\\n--------------------------------------\\r\\n--------------------------------------\\r\\n Valued Customer                491211\\r\\n--------------------------------------\\r\\n   HOW WAS YOUR SHOPPING EXPERIENCE?  \\r\\n        WE VALUE YOUR FEEDBACK!       \\r\\n   ENTER TO WIN A $100.00 GIFT CARD   \\r\\nGO TO: www.safeway.com/survey         \\r\\n    ENTER THE SURVEY CODE BELOW:      \\r\\n        987906/0503:06196/878         \\r\\n    Thank you for shopping Safeway    \\r\\nFor just for U or Rewards questions\\r\\n   call 877-276-9637 or Safeway.com   \\r\\n                                      \\r\\n***                               ***\\r\\n\", \"order_id\" : \"6520\", \"suspend_barcode_value\" : \"100019600878\", \"suspendReceiptTrailer\" : \"\\r\\n                                      \\r\\n06/05/20 03:06 9879 196 878 8833      \\r\\n                                      \\r\\n--------------------------------------\\r\\nYOUR CASHIER TODAY WAS SCAN AND GO    \\r\\n--------------------------------------\\r\\n--------------------------------------\\r\\n Valued Customer                491211\\r\\n--------------------------------------\\r\\n   HOW WAS YOUR SHOPPING EXPERIENCE?  \\r\\n        WE VALUE YOUR FEEDBACK!       \\r\\n   ENTER TO WIN A $100.00 GIFT CARD   \\r\\nGO TO: www.safeway.com/survey         \\r\\n    ENTER THE SURVEY CODE BELOW:      \\r\\n        987906/0503:06196/878         \\r\\n    Thank you for shopping Safeway    \\r\\nFor just for U or Rewards questions\\r\\n   call 877-276-9637 or Safeway.com   \\r\\n                                      \\r\\n***                               ***\"");
+        intent.putExtra("checkoutTotal","129.00");
+        intent.putExtra("subTotal","129.00");
+        intent.putExtra("taxTotal","0.00");
+        intent.putExtra("appliedDiscountsTotal","00.0");
+        intent.putExtra("ebtTotal","00.00");
+        intent.putExtra("receipt","\\r\\n                                      \\r\\nTHANKS FOR SHOPPING SAFEWAY U CHECKOUT\\r\\n\\r\\n        PHARMACY         129.00 S\\r\\n        CRV SFTDK SNGL NTX      0.05 S\\r\\n        TAX                     0.00  \\r\\n   **** BALANCE                 129.00  \\r\\n                                      \\r\\n06/05/20 03:06 9879 196 878 8833      \\r\\n                                      \\r\\n--------------------------------------\\r\\nYOUR CASHIER TODAY WAS SCAN AND GO    \\r\\n--------------------------------------\\r\\n--------------------------------------\\r\\n Valued Customer                491211\\r\\n--------------------------------------\\r\\n   HOW WAS YOUR SHOPPING EXPERIENCE?  \\r\\n        WE VALUE YOUR FEEDBACK!       \\r\\n   ENTER TO WIN A $100.00 GIFT CARD   \\r\\nGO TO: www.safeway.com/survey         \\r\\n    ENTER THE SURVEY CODE BELOW:      \\r\\n        987906/0503:06196/878         \\r\\n    Thank you for shopping Safeway    \\r\\nFor just for U or Rewards questions\\r\\n   call 877-276-9637 or Safeway.com   \\r\\n                                      \\r\\n***                               ***\\r\\n\", \"order_id\" : \"6520\", \"suspend_barcode_value\" : \"100019600878\", \"suspendReceiptTrailer\" : \"\\r\\n                                      \\r\\n06/05/20 03:06 9879 196 878 8833      \\r\\n                                      \\r\\n--------------------------------------\\r\\nYOUR CASHIER TODAY WAS SCAN AND GO    \\r\\n--------------------------------------\\r\\n--------------------------------------\\r\\n Valued Customer                491211\\r\\n--------------------------------------\\r\\n   HOW WAS YOUR SHOPPING EXPERIENCE?  \\r\\n        WE VALUE YOUR FEEDBACK!       \\r\\n   ENTER TO WIN A $100.00 GIFT CARD   \\r\\nGO TO: www.safeway.com/survey         \\r\\n    ENTER THE SURVEY CODE BELOW:      \\r\\n        987906/0503:06196/878         \\r\\n    Thank you for shopping Safeway    \\r\\nFor just for U or Rewards questions\\r\\n   call 877-276-9637 or Safeway.com   \\r\\n                                      \\r\\n***                               ***\"");
         startActivity(intent);
     }
 
@@ -517,7 +519,7 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
                                     intent.putExtra("taxTotal", receiptResponse.getResponse().getReceiptJson().getReceiptTotalResult().getTax().toString());
                                     intent.putExtra("appliedDiscountsTotal", receiptResponse.getResponse().getReceiptJson().getReceiptTotalResult().getTotalSavings().toString());
                                     intent.putExtra("ebtTotal", receiptResponse.getResponse().getReceiptJson().getReceiptTotalResult().getEbt().toString());
-                                    intent.putExtra("recalculation", receiptResponse.getResponse().getIsRecalculationNeeded().toString());
+                                   // intent.putExtra("recalculation", receiptResponse.getResponse().getIsRecalculationNeeded().toString());
                                     intent.putExtra("orderId", receiptResponse.getResponse().getOrderId().toString());
                                     intent.putExtra("storeId",receiptResponse.getResponse().getStoreId().toString());
                                     intent.putExtra("clubcard",receiptResponse.getResponse().getGuid().toString());
@@ -587,7 +589,7 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
 
     @Override
     protected void onResume() {
-            viewCart(getguid,getstoreId,getOrderId);
+         //   viewCart(getguid,getstoreId,getOrderId);
         super.onResume();
     }
 

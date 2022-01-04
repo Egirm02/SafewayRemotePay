@@ -90,9 +90,12 @@ import com.safeway.postest.Data.Transactions;
 import com.safeway.postest.Data.model.BaseResponse;
 import com.safeway.postest.Data.model.COA_Request;
 import com.safeway.postest.Data.model.COA_Response;
+import com.safeway.postest.Data.model.CheckoutPharmacy;
 import com.safeway.postest.Data.model.FinalizeSplitTransaction;
 import com.safeway.postest.Data.model.Item;
+import com.safeway.postest.Data.model.ItemDetail2;
 import com.safeway.postest.Data.model.SplitItem;
+import com.safeway.postest.Data.model.TransactionDetails;
 import com.safeway.postest.Data.model.receipt.Data;
 import com.safeway.postest.Data.remote.Service;
 import com.safeway.postest.fragment.SplitBalanceFragment;
@@ -152,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
     Boolean orderComplete=false;
     Double EBT_PaidAmount=0.00;
     Double EFT_PaidAmount=0.00;
+    Long longer = 200l;
 
     RelativeLayout rl_COA;
     LinearLayout ll_processed_payment;
@@ -167,6 +171,7 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
 
     private List<Transactions> allTransactionsList = new ArrayList<>();
     public List<Item> itemList;
+    public TransactionDetails transactionDetailsPaid;
 
     public static List<Printer> printers;
     private Printer printer;
@@ -564,10 +569,10 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
                     finalEBT_Balance = ("$ "+String.format("%.2f",d));
                 }
                 RecieptPageAdapter recieptPageAdapter = new RecieptPageAdapter(MainActivity.this,
-                        receipt,"\r\n\r\n        Subtotal              "+ String.valueOf( finalSubTotal)
-                        +"\r\n\r\n        Savings                "+ String.valueOf(finalSavings)
-                        +"\r\n\r\n         Tax                        "+ String.valueOf(finalTax)
-                        +"\r\n\r\n\n  **** Total                 "+ String.valueOf(finalTotal)
+                        receipt,"\r\n\r\n        Pharmacy test        "+ String.valueOf( finalSubTotal)
+                        +"\r\n\r\n        Savings                   "+ "0.00"
+                        +"\r\n\r\n         Tax                          "+ "0.00"
+                        +"\r\n\r\n\n  **** Total                    "+ String.valueOf(finalTotal)
                 );
 
                 RecieptPageAdapter recieptPageAdapterCOA = new RecieptPageAdapter(MainActivity.this,
@@ -1189,9 +1194,24 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
 ////            }
 //            allTransactionsList.add(transactionsEFT);
 
-           // List<Transactions> transactions = allTransactionsList;
-            FinalizeSplitTransaction finalizeSplitTransaction = new FinalizeSplitTransaction(orderId,allTransactionsList);
-            finalizeTransaction(finalizeSplitTransaction);
+            List<Transactions> transactions = allTransactionsList;
+//            FinalizeSplitTransaction finalizeSplitTransaction = new FinalizeSplitTransaction(orderId,allTransactionsList);
+//            finalizeTransaction(finalizeSplitTransaction);
+
+//            Transactions EBTtransactionRecalculate = new Transactions(card_pan_print, cardType, approval_number, amountNewRecalculate, ebtFlag, time);
+//
+//            List<Transactions> transactions = Collections.singletonList(EBTtransactionRecalculate);
+//            RecalculateTransaction recalculate = new RecalculateTransaction(orderId, transactions);
+
+            //Item List
+            ItemDetail2 itemDetail2 = new ItemDetail2("0000000022688","22688",1,false,129,"304",false);
+            List<ItemDetail2> itemDetailList = Collections.singletonList(itemDetail2);
+            //Transaction Details
+            //TransactionDetails transactionDetails = new TransactionDetails("","","","","");
+            String storeIdPharm = Util.getString(getApplicationContext(), Util.STORE_ID, "0972");
+           CheckoutPharmacy checkoutPharmacy = new CheckoutPharmacy(itemDetailList,transactionDetailsPaid,1,storeIdPharm);
+            pharmacyFinalizeTransaction(checkoutPharmacy);
+
             loadingLayout.setVisibility(View.VISIBLE);
             payButton.setVisibility(View.GONE);
             amountTax.setText("$ "+String.format("%.2f", 0.00)+" ");
@@ -1207,6 +1227,9 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
         String time = String.valueOf(transaction_complete_time);
         Transactions transactionsEFT = new Transactions(card_pan_print,cardType,approval_number,amountNew,ebtFlag,time);
         allTransactionsList.add(transactionsEFT);
+
+        TransactionDetails transactionDetails = new TransactionDetails(card_pan_print,cardType,approval_number,"129.00",time);
+        transactionDetailsPaid = transactionDetails;
     }
 
 
@@ -1364,7 +1387,7 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
                 result = "Sale was unsuccessful" + response.getReason() + ":" + response.getMessage();
                 Log.d(TAG, "onAuthResponse: "+ response);
             }
-
+            Toast.makeText(getApplication().getApplicationContext(), result, Toast.LENGTH_LONG).show();
         }
 
         @Override
@@ -1535,11 +1558,54 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
 
                     @Override
                     public void onNext(BaseResponse baseResponse) {
-
+                        loadingLayout.setVisibility(View.GONE);///remove
                         try {
                             Toast.makeText(MainActivity.this, "Added", Toast.LENGTH_SHORT).show();
 
-                            getReceipt2(orderId,storeId);
+                            //getReceipt2(orderId,storeId);
+
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
+                            Log.d(TAG, "onNext: countError"+ e.getMessage());
+                        }
+//
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+//                        LogUtil.printLogMessage("error response", t.getMessage());
+                        Log.d(TAG, "handleError: error"+ t.toString());
+                        loadingLayout.setVisibility(View.GONE);
+                        Toast.makeText(MainActivity.this, "Error Finalise, please go back and checkout again", Toast.LENGTH_SHORT).show();
+//                        progressDialog.dismiss();
+//                        tvName.setText("error :   " + t.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG, "onComplete: ");
+                    }
+                });
+    }
+
+    public void pharmacyFinalizeTransaction(CheckoutPharmacy checkoutPharmacy) {
+        Service apiService = NetworkManager.createRetrofit().create(Service.class);
+        apiService.pharmacyFinalizeCall(checkoutPharmacy)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<BaseResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.d(TAG, "onSubscribe: ");
+                    }
+
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+
+                        try {
+                            Toast.makeText(MainActivity.this, baseResponse.getOrderId(), Toast.LENGTH_SHORT).show();
+
+                           getReceipt2(baseResponse.getOrderId());
 
                         } catch (NullPointerException e) {
                             e.printStackTrace();
@@ -1638,7 +1704,7 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
 
                                 total = receiptResponse.getResponse().getReceiptJson().getReceiptTotalResult().getBalanceDue();
                                 amountET.setText("$ "+String.format("%.2f", total));
-                                recalculation = String.valueOf(receiptResponse.getResponse().getIsRecalculationNeeded());
+                            //    recalculation = String.valueOf(receiptResponse.getResponse().getIsRecalculationNeeded());
                                 EBT = receiptResponse.getResponse().getReceiptJson().getReceiptTotalResult().getEbt();
                                 ebt_recalcualted = true;
                                 Toast.makeText(MainActivity.this, "Receipt updated", Toast.LENGTH_SHORT).show();
@@ -1670,12 +1736,12 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
                 });
     }
 
-    public void getReceipt2(String orderId, String storeId) {
+    public void getReceipt2(String orderId) {
         Service apiService = NetworkManager.createRetrofit().create(Service.class);
-        apiService.getReceipt(orderId, storeId)
+        apiService.getReceiptPharmacy(orderId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .repeatWhen(completed -> Observable.interval(2, TimeUnit.SECONDS))
+                .repeat(longer)
                 .takeUntil(receiptResponse -> receiptResponse.getErrorMessage() == null&& receiptResponse.getResponse().getTransactionStatus().equals("TRANSACTION COMPLETED"))
                 .subscribe(new Observer<BaseResponse<Data>>() {
                     @Override
@@ -1719,7 +1785,7 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
                                     loadingLayout.setVisibility(View.GONE);
                                 loadingLayout.setVisibility(View.GONE);
                                     orderProcessed =false;
-                                    orderComplete= true;
+                                    orderComplete= true;  // remover to update duplicates
                                     printReceipt.setVisibility(View.VISIBLE);
                                     Toast.makeText(MainActivity.this, "Receipt updated", Toast.LENGTH_SHORT).show();
                                     payButton.setVisibility(View.GONE);
@@ -1764,6 +1830,7 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
                     @Override
                     public void onComplete() {
                         Log.d(TAG, "onComplete: ");
+                        loadingLayout.setVisibility(View.GONE);
                     }
                 });
     }
@@ -1945,6 +2012,7 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .show();
         }else if(orderComplete){
+            finish();
             Intent intent = new Intent(getBaseContext(), Home.class);
             startActivity(intent);
         }else{

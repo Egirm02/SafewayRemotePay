@@ -17,8 +17,8 @@ android {
         applicationId "com.safeway.postest3"
         minSdkVersion 17
         targetSdkVersion 24
-        versionCode 24
-        versionName "1.0"
+        versionCode 26
+        versionName "1.2"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary true

@@ -203,7 +203,7 @@
         style="@style/WhiteTitle4Bold"
         android:layout_width="match_parent"
         android:layout_height="@dimen/cta_button_height"
-        android:text="Recall Transaction"
+        android:text="Covid Test"
         android:textAllCaps="false"
         android:background="@color/black"
         android:textSize="20dp"
