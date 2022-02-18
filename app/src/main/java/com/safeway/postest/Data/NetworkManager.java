@@ -20,7 +20,7 @@ public class NetworkManager {
 
     private static OkHttpClient client;  //https://clover-payment.azure-api.net/
                                         //https://retail-api.azure-api.net/
-    public static String BASE_URL = "https://clover-payment.azure-api.net/";
+    public static String BASE_URL = "https://retail-api.azure-api.net/";
     public static String MSGRAPH_URL ="https://graph.microsoft.com/";
 
     private NetworkManager() {

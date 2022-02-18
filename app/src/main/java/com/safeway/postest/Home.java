@@ -114,8 +114,8 @@ public class Home extends AppCompatActivity {
                 loadingLayout.setVisibility(View.GONE);
                // Toast.makeText(Home.this, "Terminal: " + receiptResponse.getResponse().getTerminalNumber(), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getBaseContext(), CartActivity.class);
-                intent.putExtra("guid", "00");
-                intent.putExtra("storeId", "00");
+                intent.putExtra("guid", "100-167-1565301748025");
+                intent.putExtra("storeId", "9879");
                 intent.putExtra("orderId", "00");
                 startActivity(intent);
             }

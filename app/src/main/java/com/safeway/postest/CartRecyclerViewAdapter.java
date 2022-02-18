@@ -23,6 +23,7 @@ import com.safeway.postest.Data.model.Cart;
 import com.safeway.postest.Data.model.CartItem;
 import com.safeway.postest.Data.model.Item;
 import com.safeway.postest.Data.model.ItemIdRequest;
+import com.safeway.postest.Data.model.Items;
 import com.safeway.postest.Data.remote.Service;
 import com.squareup.picasso.Picasso;
 
@@ -40,7 +41,7 @@ import static androidx.constraintlayout.widget.Constraints.TAG;
 public class CartRecyclerViewAdapter extends RecyclerView.Adapter<CartRecyclerViewAdapter.ViewHolder> {
 
 
-    public List<Item> itemList;
+    public List<Items> itemList;
     private OnItemClickListener mOnItemClickListener;
     Boolean deleteItem= false;
 
@@ -61,11 +62,11 @@ public class CartRecyclerViewAdapter extends RecyclerView.Adapter<CartRecyclerVi
 
     @Override
     public void onBindViewHolder(@NonNull CartRecyclerViewAdapter.ViewHolder holder, int position) {
-        Item cartItem = itemList.get(position);
+        Item cartItem = itemList.get(position).getItem();
        // CartItem cart = cartList.getData().get(position;
 
         holder.txtName.setText(cartItem.getPosDescription());
-        holder.txtPrice.setText("$ " + cartItem.getExtendedPrice().toString());
+        holder.txtPrice.setText("$ " + cartItem.getSellPrice().toString());
         holder.etqunt.setText(cartItem.getSellMultiple().toString());
 
             if(cartItem.getRemovedItem()!= null &&cartItem.getRemovedItem()){
@@ -84,13 +85,13 @@ public class CartRecyclerViewAdapter extends RecyclerView.Adapter<CartRecyclerVi
             }
         Picasso.get().load(R.drawable.icon_ebt_green)
                 .into(holder.ivebt);
-        if(cartItem.getFoodStamp()==true){
-            holder.ivebt.setVisibility(View.VISIBLE);
-
-        }
-        else{
-            holder.ivebt.setVisibility(View.INVISIBLE);
-        }
+//        if(cartItem.getFoodStamp()==true){
+//            holder.ivebt.setVisibility(View.VISIBLE);
+//
+//        }
+//        else{
+//            holder.ivebt.setVisibility(View.INVISIBLE);
+//        }
 
 //        holder.removerIcon.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -103,7 +104,10 @@ public class CartRecyclerViewAdapter extends RecyclerView.Adapter<CartRecyclerVi
 //            }
 //        });
 
-        Picasso.get().load("https://images.albertsons-media.com/is/image/ABS/0"+cartItem.getScanCode()+"?$ecom-product-card-desktop$&defaultImage=Not_Available")
+        Picasso.get().load(
+              //  "https://images.albertsons-media.com/is/image/ABS/0"+cartItem.getScanCode()+"?$ecom-product-card-desktop$&defaultImage=Not_Available"
+                cartItem.getImageUrl()
+        )
                 .resize(250,250)
                 .centerCrop()
                 .into(holder.ivItem);
@@ -122,7 +126,7 @@ public class CartRecyclerViewAdapter extends RecyclerView.Adapter<CartRecyclerVi
         return itemList.size() ;
     }
 
-    public void setData(List<Item> data){
+    public void setData(List<Items> data){
         this.itemList = data;
 //        notifyDataSetChanged();
     }

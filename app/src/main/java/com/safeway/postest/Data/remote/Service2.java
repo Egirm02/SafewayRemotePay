@@ -73,10 +73,9 @@ public interface Service2 {
     @Headers({"Accept: application/json",
             "Content-Type: application/json",
             "Ocp-Apim-Subscription-Key: 78ae78149bff429789d33a7b15c32437",
-            "GUID:200-160-1531871357979",
 
     })
-    Observable<BaseResponse> addItemToCart(@Query("clientId") String clientId, @Body ItemRequest itemRequest, @Header("storeid") String storeid);
+    Observable<BaseResponse> addItemToCart(@Query("clientId") String clientId, @Body ItemRequest itemRequest, @Header("storeid") String storeid,@Header("guid") String guid);
 
     @PUT("cloverPaymentDev/removeItems")
     @Headers({"Accept: application/json",
@@ -93,10 +92,10 @@ public interface Service2 {
 //
 //    })
 //    Observable<BaseResponse<Cart>> getCart(@Query("clientId") String clientId, @Header("storeid") String storeid);
-    @GET("cloverPaymentDev/viewCart")
+    @GET("scanandgoemp/viewCart")
     @Headers({"Accept: application/json",
             "Content-Type: application/json",
-            "Ocp-Apim-Subscription-Key: 7024f91451d74393bbf891483210dc28",
+            "Ocp-Apim-Subscription-Key: 78ae78149bff429789d33a7b15c32437",
 
     })
     Observable<BaseResponse<Cart>> getCart(@Header("guid") String guid, @Header("storeid") String storeid, @Header("orderId") String orderId);

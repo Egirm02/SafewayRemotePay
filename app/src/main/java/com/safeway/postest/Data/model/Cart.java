@@ -12,7 +12,7 @@ public class Cart extends BaseObservable {
     private String _id;
 
     @SerializedName("items")
-    private List<Item> data;
+    private List<Items> items;
 
 
     @SerializedName("total_quantity")
@@ -33,20 +33,20 @@ public class Cart extends BaseObservable {
     public Cart() {
     }
 
-    public Cart(List<Item> data) {
-        this.data = data;
+    public Cart(List<Items> data) {
+        this.items = data;
     }
 
     public void set_id(String _id) {
         this._id = _id;
     }
 
-    public void setData(List<Item> data) {
-        this.data = data;
+    public void setData(List<Items> data) {
+        this.items = data;
     }
 
-    public List<Item> getData() {
-        return data;
+    public List<Items> getData() {
+        return items;
     }
 
     public String get_id() {
@@ -107,7 +107,7 @@ public class Cart extends BaseObservable {
     @Override
     public String toString() {
         return "Cart{" +
-                "data=" + data +
+                "data=" + items +
                 ", totalQuantity=" + totalQuantity +
                 ", totalPrice=" + totalPrice +
                 ", timeStamp=" + timeStamp +

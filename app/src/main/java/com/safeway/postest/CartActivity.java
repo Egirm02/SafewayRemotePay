@@ -24,11 +24,13 @@ import com.safeway.postest.Data.model.Cart;
 import com.safeway.postest.Data.model.Item;
 import com.safeway.postest.Data.model.ItemIdRequest;
 import com.safeway.postest.Data.model.ItemRequest;
+import com.safeway.postest.Data.model.Items;
 import com.safeway.postest.Data.model.checkout.Data2;
 import com.safeway.postest.Data.model.Item_ids_remove_list;
 import com.safeway.postest.Data.model.receipt.Data;
 import com.safeway.postest.Data.model.receipt.Receipt;
 import com.safeway.postest.Data.remote.Service;
+import com.safeway.postest.Data.remote.Service2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,7 +68,7 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
 
 
     public Cart cartList;
-    public List<Item> itemList;
+    public List<Items> itemList;
 
     String estTotal;
 
@@ -96,7 +98,7 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
 //            if (getViewCart.equals("true")){
 //                viewCart("default","9879");
 //            }
-            viewCart(getguid,getstoreId,getOrderId);
+           // viewCart(getguid,getstoreId,getOrderId);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -186,7 +188,7 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
     }
 
     public void getItemLookup2(String scanCode, String upcType,String storeid) {
-        Service apiService = NetworkManager.createRetrofit().create(Service.class);
+        Service2 apiService = NetworkManager.createRetrofit().create(Service2.class);
         apiService.getItem(scanCode,upcType,storeid)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -206,8 +208,8 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
                             if(itemBaseResponse.getResponse()!=null){
 
                             Toast.makeText(CartActivity.this, itemBaseResponse.getResponse().getExtDescription(), Toast.LENGTH_SHORT).show();
-                           ItemRequest itemRequest = new ItemRequest(itemBaseResponse.getResponse().getItemId(),1,itemBaseResponse.getResponse().getUpcType(),false);
-                            addItemToCart("default",itemRequest,"9879");
+                           ItemRequest itemRequest = new ItemRequest(itemBaseResponse.getResponse().getItemId(),1,"upca",false);
+                            addItemToCart("default",itemRequest,"9879",getguid);
                         }
                         } catch (NullPointerException e) {
                             e.printStackTrace();
@@ -232,9 +234,9 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
                 });
     }
 
-    public void addItemToCart(String scanCode, ItemRequest upcType, String storeid) {
-        Service apiService = NetworkManager.createRetrofit().create(Service.class);
-        apiService.addItemToCart(scanCode,upcType,storeid)
+    public void addItemToCart(String scanCode, ItemRequest upcType, String storeid,String guid) {
+        Service2 apiService = NetworkManager.createRetrofit().create(Service2.class);
+        apiService.addItemToCart(scanCode,upcType,storeid,guid)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<BaseResponse>() {
@@ -308,7 +310,7 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
     }
 
     public void viewCart(String guid, String storeid, String orderId) {
-        Service apiService = NetworkManager.createRetrofit().create(Service.class);
+        Service2 apiService = NetworkManager.createRetrofit().create(Service2.class);
         apiService.getCart(guid,storeid,orderId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -356,7 +358,7 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
                 });
     }
 
-    private void handleResultsCart(List<Item> items) {
+    private void handleResultsCart(List<Items> items) {
         this.itemList = items;
 
         cartRecyclerViewAdapter.setData(items);
@@ -465,11 +467,11 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
     public void checkoutDemo(){
         Toast.makeText(CartActivity.this, "Terminal: "+"123",Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(getBaseContext(),MainActivity.class);
-        intent.putExtra("checkoutTotal","140.18");
-        intent.putExtra("subTotal","148.9");
-        intent.putExtra("taxTotal","8.78");
-        intent.putExtra("appliedDiscountsTotal","17.5");
-        intent.putExtra("ebtTotal","78.03");
+        intent.putExtra("checkoutTotal","7.52");
+        intent.putExtra("subTotal","7.77");
+        intent.putExtra("taxTotal","1.00");
+        intent.putExtra("appliedDiscountsTotal","1.15");
+        intent.putExtra("ebtTotal","7.77");
         intent.putExtra("receipt","\\r\\n                                      \\r\\nTHANKS FOR SHOPPING SAFEWAY U CHECKOUT\\r\\n\\r\\n        SIG COFFEE COLD         1.99 S\\r\\n        CRV SFTDK SNGL NTX      0.05 S\\r\\n        TAX                     0.00  \\r\\n   **** BALANCE                 2.04  \\r\\n                                      \\r\\n06/05/20 03:06 9879 196 878 8833      \\r\\n                                      \\r\\n--------------------------------------\\r\\nYOUR CASHIER TODAY WAS SCAN AND GO    \\r\\n--------------------------------------\\r\\n--------------------------------------\\r\\n Valued Customer                491211\\r\\n--------------------------------------\\r\\n   HOW WAS YOUR SHOPPING EXPERIENCE?  \\r\\n        WE VALUE YOUR FEEDBACK!       \\r\\n   ENTER TO WIN A $100.00 GIFT CARD   \\r\\nGO TO: www.safeway.com/survey         \\r\\n    ENTER THE SURVEY CODE BELOW:      \\r\\n        987906/0503:06196/878         \\r\\n    Thank you for shopping Safeway    \\r\\nFor just for U or Rewards questions\\r\\n   call 877-276-9637 or Safeway.com   \\r\\n                                      \\r\\n***                               ***\\r\\n\", \"order_id\" : \"6520\", \"suspend_barcode_value\" : \"100019600878\", \"suspendReceiptTrailer\" : \"\\r\\n                                      \\r\\n06/05/20 03:06 9879 196 878 8833      \\r\\n                                      \\r\\n--------------------------------------\\r\\nYOUR CASHIER TODAY WAS SCAN AND GO    \\r\\n--------------------------------------\\r\\n--------------------------------------\\r\\n Valued Customer                491211\\r\\n--------------------------------------\\r\\n   HOW WAS YOUR SHOPPING EXPERIENCE?  \\r\\n        WE VALUE YOUR FEEDBACK!       \\r\\n   ENTER TO WIN A $100.00 GIFT CARD   \\r\\nGO TO: www.safeway.com/survey         \\r\\n    ENTER THE SURVEY CODE BELOW:      \\r\\n        987906/0503:06196/878         \\r\\n    Thank you for shopping Safeway    \\r\\nFor just for U or Rewards questions\\r\\n   call 877-276-9637 or Safeway.com   \\r\\n                                      \\r\\n***                               ***\"");
         startActivity(intent);
     }
@@ -556,7 +558,7 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
     }
     @Override
     public void onItemClick(int position, Boolean deleteItem) {
-        Item cartItem = itemList.get(position);
+        Item cartItem = itemList.get(position).getItem();
       //  if (deleteItem){
 //        Item_ids_remove_list item_ids_remove_list = new Item_ids_remove_list();
 //        item_ids_remove_list.setItem_id(cartItem.getItemId());
@@ -572,7 +574,7 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
             List<Object> newList = new ArrayList<>();
             newList.add(cartItem.getItemId());
             newList.add(cartItem.getSellMultiple());
-            newList.add(cartItem.getItemNum());
+           // newList.add(cartItem.getItemNum());
             listOfMixedTypes.add(newList);
 
 

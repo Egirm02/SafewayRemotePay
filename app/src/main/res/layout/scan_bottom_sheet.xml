@@ -107,7 +107,7 @@
                 android:id="@+id/Img_btn_scanBarcodeBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
+
                 android:background="@drawable/btn_scan_barcode_selector"
                 android:contentDescription=" scan_barcode_button"
 
