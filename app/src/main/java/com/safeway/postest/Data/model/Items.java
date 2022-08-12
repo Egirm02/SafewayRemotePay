@@ -26,6 +26,28 @@ public class Items {
         @SerializedName("item")
         @Expose
         private Item item;
+        @SerializedName("weight")
+        @Expose
+        private double weight;
+        @SerializedName("guid")
+        @Expose
+        private String guid;
+
+        public String getGuid() {
+            return guid;
+        }
+
+        public void setGuid(String guid) {
+            this.guid = guid;
+        }
+
+        public double getWeight() {
+            return weight;
+        }
+
+        public void setWeight(double weight) {
+            this.weight = weight;
+        }
 
         public String getScanCode() {
             return scanCode;

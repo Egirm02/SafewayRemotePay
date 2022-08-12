@@ -24,7 +24,7 @@
             android:gravity="center"
             android:paddingBottom="20dp"
             android:paddingTop="15dp"
-            android:weightSum="3"
+            android:weightSum="2"
 
             android:orientation="horizontal">
 
@@ -54,7 +54,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_gravity="center"
+               android:layout_marginLeft="30dp"
+                android:gravity="center"
                 >
                 <ImageButton
                     android:id="@+id/keyInCodeBtn"
@@ -72,15 +73,15 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_marginLeft="100dp"
                 android:gravity="right"
-                android:layout_weight="1">
+                android:layout_weight="0.4">
 <!--TODO activate card-->
                 <TextView
-                    android:id="@+id/searchPluBtn"
+                    android:id="@+id/tvSearchClubCard"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Search Club Card"
+                    android:text="Search Club Member"
 
                     android:textColor="@color/white"
                     android:contentDescription="Look up Club Card"

@@ -7,6 +7,7 @@ import com.safeway.postest.Data.model.BaseResponse;
 import com.safeway.postest.Data.model.COA_Request;
 import com.safeway.postest.Data.model.COA_Response;
 import com.safeway.postest.Data.model.Cart;
+import com.safeway.postest.Data.model.CheckoutResponse;
 import com.safeway.postest.Data.model.FinalizeSplitTransaction;
 import com.safeway.postest.Data.model.Item;
 import com.safeway.postest.Data.model.ItemIdRequest;
@@ -54,51 +55,93 @@ public interface Service2 {
 //    @GET("{coin}-usd")
 //    Observable<Crypto> getCoinData(@Path("coin") String coin);
 
+    //Prod key 703f24b413024248b302a2f16ab5a0fe
+    // scanandgoprod
+    //Dev key 78ae78149bff429789d33a7b15c32437
+    // scanandgodev
+    //QA key 8de2cd8ae8b449aaa054f34a024c507b  2adea0f3833f433984136e291fbab38b
+    // scanandgoqa
 
-    @GET("scanandgodev/getReceipt?orderId=")
+    @GET("scanandgoprod/checkOutCart")
     @Headers({"Accept: application/json",
             "Content-Type: application/json",
-            "Ocp-Apim-Subscription-Key: 78ae78149bff429789d33a7b15c32437",
+            "Ocp-Apim-Subscription-Key: 703f24b413024248b302a2f16ab5a0fe",
+            "x-swy-client-id: clover"
     })
-    Observable<ReceiptResponse> getCoinData(@Query("orderid") String orderid);
+    Observable<BaseResponse<CheckoutResponse>> checkoutCart(@Header("storeid") String storeid,@Header("guid") String guid,@Header("clubcard_nbr") String clubcard_nbr);
 
-    @GET("scanandgoemp/itemLookup?")
+
+    @GET("scanandgoprod/getReceipt?orderId=")
     @Headers({"Accept: application/json",
             "Content-Type: application/json",
-            "Ocp-Apim-Subscription-Key: 78ae78149bff429789d33a7b15c32437",
+            "Ocp-Apim-Subscription-Key: 703f24b413024248b302a2f16ab5a0fe",
+    })
+    Observable<BaseResponse<ReceiptResponse>> getReceiptSnP(@Query("orderid") String orderid);
+
+    @POST("scanandgoprod/finalizeSplitTransaction")
+    @Headers({"Accept: application/json",
+            "Content-Type: application/json",
+            "Ocp-Apim-Subscription-Key: 703f24b413024248b302a2f16ab5a0fe"
+    })
+    Observable<BaseResponse> finalizeCallSnP(@Body FinalizeSplitTransaction finalizeSplitTransaction, @Header("storeid") String storeId);
+
+    //Prod key 7e0105e413484c059127085e72aed41f
+    //scanandgoprodjs
+    //Dev key 2adea0f3833f433984136e291fbab38b
+    //scanandgodevjs
+    //Dev key 78ae78149bff429789d33a7b15c32437
+    //scanandgoemp
+    // QA key 7024f91451d74393bbf891483210dc28  8de2cd8ae8b449aaa054f34a024c507b
+    //  scanandgoQaJS/auditCart
+
+    @GET("scanandgoprodjs/itemLookup?")
+    @Headers({"Accept: application/json",
+            "Content-Type: application/json",
+            "Ocp-Apim-Subscription-Key: 7e0105e413484c059127085e72aed41f",
     })
     Observable<BaseResponse<Item>> getItem(@Query("scan_code") String code, @Query("upc_type") String upcType, @Query("storeid") String storeid);
 
-    @PUT("scanandgoemp/addItemToCart")
+    @PUT("scanandgoprodjs/addItemToCart")
     @Headers({"Accept: application/json",
             "Content-Type: application/json",
-            "Ocp-Apim-Subscription-Key: 78ae78149bff429789d33a7b15c32437",
+            "Ocp-Apim-Subscription-Key: 7e0105e413484c059127085e72aed41f",
 
     })
     Observable<BaseResponse> addItemToCart(@Query("clientId") String clientId, @Body ItemRequest itemRequest, @Header("storeid") String storeid,@Header("guid") String guid);
 
+    @PUT("scanandgoprodjs/removeItems")
+    @Headers({"Accept: application/json",
+            "Content-Type: application/json",
+            "Ocp-Apim-Subscription-Key: 7e0105e413484c059127085e72aed41f"})
+    Completable deleteItemsFromCart(@Query("clientId") String clientId, @Body ItemIdRequest itemIds, @Header("storeid") String storeid,@Header("guid") String guid);
+
+
+
+    @GET("scanandgoprodjs/viewCart")
+    @Headers({"Accept: application/json",
+            "Content-Type: application/json",
+            "Ocp-Apim-Subscription-Key: 7e0105e413484c059127085e72aed41f",
+            "app: sng",
+            "version: 3.1.2",
+            "clubcard_nbr: 49236827917"
+
+
+    })
+    Observable<BaseResponse<Cart>> getCart(@Header("guid") String guid, @Header("storeid") String storeid);
+
+    @GET("retailoperations/phone/status")
+    @Headers({"Accept: application/json",
+            "Content-Type: application/json",
+            "Ocp-Apim-Subscription-Key: c3306584cdd2499c92e2594e48eba542"
+    })
+    Observable<BaseResponse> getPhoneStatus(@Header("number")String number);
+//////////////
     @PUT("cloverPaymentDev/removeItems")
     @Headers({"Accept: application/json",
             "Content-Type: application/json",
             "Ocp-Apim-Subscription-Key: 2f480da761e145f081a04a1e8ac0f59a",
     })
     Completable deleteItemFromCart(@Body ItemIdRequest itemIds, @Header("storeid") String storeid,@Header("guid") String guid,@Header("orderId") String orderId,@Header("add") Boolean add);
-
-    //    @GET("scanandgoemp/viewCart")
-//    @Headers({"Accept: application/json",
-//            "Content-Type: application/json",
-//            "Ocp-Apim-Subscription-Key: 78ae78149bff429789d33a7b15c32437",
-//            "GUID:200-160-1531871357979",
-//
-//    })
-//    Observable<BaseResponse<Cart>> getCart(@Query("clientId") String clientId, @Header("storeid") String storeid);
-    @GET("scanandgoemp/viewCart")
-    @Headers({"Accept: application/json",
-            "Content-Type: application/json",
-            "Ocp-Apim-Subscription-Key: 78ae78149bff429789d33a7b15c32437",
-
-    })
-    Observable<BaseResponse<Cart>> getCart(@Header("guid") String guid, @Header("storeid") String storeid, @Header("orderId") String orderId);
 
     //cloverPaymentProd/getReceipt
     //7024f91451d74393bbf891483210dc28

@@ -12,7 +12,7 @@ public class ItemRequest {
 
     private String upc_type;
 
-    private Double Weight;
+    private Double weight;
 
     private String scan_code;
 
@@ -24,11 +24,11 @@ public class ItemRequest {
 
 //    private Boolean bag_item;
 
-    public ItemRequest(String item_id, int quantity, String upcType, Boolean bag_item) {
+    public ItemRequest(String item_id, int quantity, String upcType, String scan_code, Boolean bag_item) {
         this.item_id = item_id;
         this.quantity = quantity;
         this.upc_type = upcType;
-        this.scan_code = item_id;
+        this.scan_code = scan_code;
 //        this.bag_item = bag_item;
     }
 
@@ -44,7 +44,7 @@ public class ItemRequest {
 
     public ItemRequest(String item_id, double weight, String upcType, String scancode, Boolean bag_item, List<ClubPrice> clubPrice, List<JfuOffers> jfuOffers) {
         this.item_id = item_id;
-        this.Weight = weight;
+        this.weight = weight;
         this.upc_type = upcType;
         this.scan_code = scancode;
 //        this.bag_item = bag_item;
@@ -63,7 +63,7 @@ public class ItemRequest {
 
     public ItemRequest(String item_id, double weight, String upcType, String scancode, Boolean bag_item, List<JfuOffers> jfuOffers) {
         this.item_id = item_id;
-        this.Weight = weight;
+        this.weight = weight;
         this.upc_type = upcType;
         this.scan_code = scancode;
 //        this.bag_item = bag_item;
@@ -71,11 +71,12 @@ public class ItemRequest {
     }
 
 
-    public ItemRequest(String item_id, Double Weight, String upcType) {
+    public ItemRequest(String item_id, double weight, String upcType, int quantity, String scan_code) {
         this.item_id = item_id;
-        this.Weight = Weight;
+        this.weight = weight;
         this.upc_type = upcType;
-        this.scan_code = item_id;
+        this.scan_code = scan_code;
+        this.quantity = quantity;
     }
 
     public String getScancode() {
@@ -95,11 +96,11 @@ public class ItemRequest {
 //    }
 
     public Double getWeight() {
-        return Weight;
+        return weight;
     }
 
     public void setWeight(Double weight) {
-        Weight = weight;
+        weight = weight;
     }
 
     public int getQuantity() {

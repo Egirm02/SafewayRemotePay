@@ -169,34 +169,33 @@
 
             <LinearLayout
                 android:id="@+id/constraintLayout5"
-                android:layout_width="80dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="true"
                 android:focusable="true"
-                android:layout_marginLeft="10dp"
+
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/ic_bordered_rectangle"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/iv_ebt"
+                app:layout_constraintStart_toStartOf="@+id/iv_ebt"
                 app:layout_constraintTop_toBottomOf="@+id/ivImage">
 
-<!--                <ImageView-->
-<!--                    android:id="@+id/minus"-->
-<!--                    android:layout_width="40dp"-->
-<!--                    android:layout_height="40dp"-->
-<!--                    android:src="@drawable/minus"/>-->
-<!--                <ImageView-->
-<!--                    android:id="@+id/minus_disabled"-->
-<!--                    android:visibility="gone"-->
-<!--                    android:layout_width="40dp"-->
-<!--                    android:layout_height="40dp"-->
-<!--                    android:src="@drawable/minus_disabled"/>-->
+                <ImageView
+                    android:id="@+id/minus"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/minus"/>
+                <ImageView
+                    android:id="@+id/minus_disabled"
+                    android:visibility="gone"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/minus_disabled"/>
                 <EditText
                     android:id="@+id/et_qunt"
                     android:layout_width="40dp"
                     android:layout_height="20dp"
-                    android:layout_marginLeft="20dp"
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:background="@color/white"
@@ -204,17 +203,17 @@
                     android:editable="false"
                     android:inputType="none"
                     />
-<!--                <ImageView-->
-<!--                    android:id="@+id/plus"-->
-<!--                    android:layout_width="40dp"-->
-<!--                    android:layout_height="40dp"-->
-<!--                    android:src="@drawable/plus"/>-->
-<!--                <ImageView-->
-<!--                    android:id="@+id/plus_disabled"-->
-<!--                    android:visibility="gone"-->
-<!--                    android:layout_width="40dp"-->
-<!--                    android:layout_height="40dp"-->
-<!--                    android:src="@drawable/plus_disabled"/>-->
+                <ImageView
+                    android:id="@+id/plus"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/plus"/>
+                <ImageView
+                    android:id="@+id/plus_disabled"
+                    android:visibility="gone"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/plus_disabled"/>
             </LinearLayout>
 
             <ImageView
@@ -338,6 +337,21 @@
                 android:textSize="18sp"
                 app:fontFamily="@font/roboto_bold"
                 app:layout_constraintStart_toStartOf="@+id/txtName"
+                app:layout_constraintTop_toTopOf="@+id/constraintLayout5"
+                />
+
+            <TextView
+                android:id="@+id/txtPriceDiscounted"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:textAlignment="center"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="60dp"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                app:fontFamily="@font/roboto_bold"
+                app:layout_constraintStart_toStartOf="@+id/txtPrice"
                 app:layout_constraintTop_toTopOf="@+id/constraintLayout5"
                 />
 

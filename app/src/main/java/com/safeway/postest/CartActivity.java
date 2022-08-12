@@ -5,10 +5,19 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.InputType;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -21,16 +30,20 @@ import com.google.zxing.integration.android.IntentResult;
 import com.safeway.postest.Data.NetworkManager;
 import com.safeway.postest.Data.model.BaseResponse;
 import com.safeway.postest.Data.model.Cart;
+import com.safeway.postest.Data.model.CheckoutResponse;
 import com.safeway.postest.Data.model.Item;
 import com.safeway.postest.Data.model.ItemIdRequest;
 import com.safeway.postest.Data.model.ItemRequest;
 import com.safeway.postest.Data.model.Items;
+import com.safeway.postest.Data.model.ReceiptResponse;
 import com.safeway.postest.Data.model.checkout.Data2;
 import com.safeway.postest.Data.model.Item_ids_remove_list;
 import com.safeway.postest.Data.model.receipt.Data;
 import com.safeway.postest.Data.model.receipt.Receipt;
 import com.safeway.postest.Data.remote.Service;
 import com.safeway.postest.Data.remote.Service2;
+import com.safeway.postest.scanner.view.BarcodeScanActivity;
+import com.scandit.datacapture.core.I;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,21 +64,26 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
 
     ImageButton scanButton;
     Button checkoutButton;
-    Button scanClubCard;
+    TextView scanClubCard;
     RecyclerView cartRecyclerView;
     CartRecyclerViewAdapter cartRecyclerViewAdapter;
     TextView cartTotal;
+    TextView loadingCheckoutText;
     EditText etClubcard;
     LinearLayout checkoutLayout;
     ConstraintLayout loadingLayout;
     String getguid;
     String getstoreId;
     String getOrderId;
+    String getCC_PhoneNumber;
+    String getScanResult;
+    String upcType="";
 
     Boolean deleteItemPressed = false;
     Boolean itemRemoved = false;
     Boolean needRecalculate= false;
 
+    ImageButton btnEnterPLU;
 
     public Cart cartList;
     public List<Items> itemList;
@@ -86,14 +104,18 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
         cartRecyclerViewAdapter = new CartRecyclerViewAdapter(this);
         cartRecyclerView.setAdapter(cartRecyclerViewAdapter);
         loadingLayout = findViewById(R.id.loadingLayout);
-        scanClubCard = findViewById(R.id.btn_Scan_club_card);
+        scanClubCard = findViewById(R.id.tvSearchClubCard);
         etClubcard = findViewById(R.id.et_Club_card_input);
+        loadingCheckoutText = findViewById(R.id.textView8);
+        btnEnterPLU = findViewById(R.id.keyInCodeBtn);
 
         String getViewCart = getIntent().getStringExtra("viewCart");
         String recallNumber = getIntent().getStringExtra("viewCart");
         getguid = getIntent().getStringExtra("guid");
         getstoreId = getIntent().getStringExtra("storeId");
         getOrderId = getIntent().getStringExtra("orderId");
+        getScanResult = getIntent().getStringExtra("SCANCODE");
+        getCC_PhoneNumber = getIntent().getStringExtra("cc_PhoneNumber");
         try {
 //            if (getViewCart.equals("true")){
 //                viewCart("default","9879");
@@ -104,6 +126,7 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
             e.printStackTrace();
         }
 
+        initAdapter();
 //        try {
 //            JSONObject  json_object = new JSONObject(getIntent().getStringExtra("receipt"));
 //
@@ -126,68 +149,231 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
             @Override
             public void onClick(View view) {
                 IntentIntegrator integrator = new IntentIntegrator(CartActivity.this);
-                integrator.setCaptureActivity(CaptureActivityPortrait.class);
+                integrator.setCaptureActivity(BarcodeScanActivity.class);
                 integrator.setOrientationLocked(false);
                 integrator.initiateScan();
             }
         });
+//        checkoutButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//             // getCheckout(getstoreId,getguid,getguid);
+//               checkoutDemo();
+//                if(deleteItemPressed || needRecalculate){
+//           //         getCheckout(getstoreId,getguid,getguid,getOrderId);
+//                }else{
+//                    checkoutDemo();
+//           //         needRecalculate =true;
+//                    getReceipt(getOrderId,getstoreId);
+//                }
+//
+//                loadingLayout.setVisibility(View.VISIBLE);
+//              //  getReceipt(getOrderId);
+////            Intent intent = new Intent(getBaseContext(),MainActivity.class);
+////            intent.putExtra("checkoutTotal",estTotal);
+////                startActivity(intent);
+//            }
+//        });
+
         checkoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-             // getCheckout(getstoreId,getguid,getguid);
-               checkoutDemo();
-                if(deleteItemPressed || needRecalculate){
-           //         getCheckout(getstoreId,getguid,getguid,getOrderId);
-                }else{
-                    checkoutDemo();
-           //         needRecalculate =true;
-                    getReceipt(getOrderId,getstoreId);
-                }
-
+                checkoutCart(getstoreId,getguid,getCC_PhoneNumber);
+                //getReceiptSnP("349870");
+                loadingCheckoutText.setVisibility(View.VISIBLE);
                 loadingLayout.setVisibility(View.VISIBLE);
-              //  getReceipt(getOrderId);
-//            Intent intent = new Intent(getBaseContext(),MainActivity.class);
-//            intent.putExtra("checkoutTotal",estTotal);
-//                startActivity(intent);
+            }
+        });
+
+        btnEnterPLU.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder alert = new AlertDialog.Builder(CartActivity.this);
+
+                final EditText edittext = new EditText(CartActivity.this);
+                edittext.setInputType(InputType.TYPE_CLASS_NUMBER);
+                edittext.setFilters(new InputFilter[]{new InputFilter.LengthFilter(5)});
+                alert.setTitle("Price Look up");
+                alert.setMessage("Enter Your PLU");
+
+                alert.setView(edittext);
+
+                alert.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        //What ever you want to do with the value
+//                        Editable YouEditTextValue = edittext.getText();
+                        //OR
+                        String PLUValue = edittext.getText().toString();
+                        getItemLookup2(PLUValue,"PLU",getstoreId,false,"0");
+                    }
+                });
+
+                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // what ever you want to do with No option.
+                    }
+                });
+
+                alert.show();
+
             }
         });
 
         scanClubCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                IntentIntegrator integrator = new IntentIntegrator(CartActivity.this);
-                integrator.setCaptureActivity(CaptureActivityPortrait.class);
-                integrator.setOrientationLocked(false);
-                integrator.initiateScan();
+                AlertDialog.Builder alert = new AlertDialog.Builder(CartActivity.this);
+
+                final EditText edittext = new EditText(CartActivity.this);
+                edittext.setInputType(InputType.TYPE_CLASS_NUMBER);
+                edittext.setFilters(new InputFilter[]{new InputFilter.LengthFilter(10)});
+                alert.setTitle("Search Member Phone Number");
+                alert.setMessage("Enter Customer Number");
+
+                alert.setView(edittext);
+
+                alert.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        //What ever you want to do with the value
+//                        Editable YouEditTextValue = edittext.getText();
+                        //OR
+                        String phoneNumber = edittext.getText().toString();
+                       validPhoneCheck(phoneNumber);
+                    }
+                });
+
+                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // what ever you want to do with No option.
+                    }
+                });
+
+                alert.show();
+
             }
+
         });
     }
+
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+//        if(result != null) {
+//            if(result.getContents() == null) {
+//                Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
+//                getItemLookup2(data.getStringExtra("SCANCODE"),"UPCA",getstoreId);
+//
+//            } else {
+//                if(result.getContents().equals("410511246024")){
+//                    etClubcard.setText(result.getContents().toString());
+//                }else{
+//                if(result.getContents().length()>4){
+//                //Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+//                getItemLookup2(result.getContents(),"UPCA",getstoreId);
+//                } else {
+//                    Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+//                    getReceipt(result.getContents(),getstoreId);
+//                }
+//                }
+//            }
+//        } else {
+//            super.onActivityResult(requestCode, resultCode, data);
+//        }
+//    }
+
+   public void validPhoneCheck (String phone) {
+        Service2 apiService2 = NetworkManager.createRetrofit().create(Service2.class);
+        apiService2.getPhoneStatus(phone)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<BaseResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+
+                        if(baseResponse.getMessage().equals("valid user")){
+                            loadingLayout.setVisibility(View.GONE);
+                             Toast.makeText(CartActivity.this, "Member Phone Number Updated", Toast.LENGTH_SHORT).show();
+                            getCC_PhoneNumber = phone;
+                        } else {
+                            phoneCheckError();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        phoneCheckError();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private void phoneCheckError(){
+        AlertDialog alertDialog = new AlertDialog.Builder(CartActivity.this).create();
+        alertDialog.setTitle("Notice");
+        alertDialog.setMessage("Enter a valid Member phone number.");
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        hideSoftKeyBoard();
+        loadingLayout.setVisibility(View.GONE);
+        alertDialog.show();
+    };
+
+    private void hideSoftKeyBoard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+        if(imm.isAcceptingText()) { // verify if the soft keyboard is open
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if(result != null) {
-            if(result.getContents() == null) {
+        if(data != null) {
+            if(data.getStringExtra("SCANCODE") == null) {
                 Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
             } else {
-                if(result.getContents().equals("410511246024")){
-                    etClubcard.setText(result.getContents().toString());
-                }else{
-                if(result.getContents().length()>4){
-                Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
-                getItemLookup2(result.getContents(),"UPCA","9879");
-                } else {
-                    Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
-                    getReceipt(result.getContents(),getstoreId);
-                }
-                }
+                    if(data.getStringExtra("SCANCODE").length()>4){
+
+                        if(data.getStringExtra("UPCTYPE")!=null){
+                            //Check for scandit combined symbology and set UPCA
+                            if(data.getStringExtra("UPCTYPE").equals("EAN-13/UPC-A")||data.getStringExtra("UPCTYPE").equals("EAN13_UPCA")||data.getStringExtra("UPCTYPE").equals("EAN8")){
+                                upcType = "UPCA";
+                            }else{
+                                upcType = data.getStringExtra("UPCTYPE");
+                            }
+                            //Check for weight item
+                            if(data.getStringExtra("isweight").equals("true")){
+                                getItemLookup2(data.getStringExtra("SCANCODE"),upcType,getstoreId,true,data.getStringExtra("SCANWT"));
+                            }else{
+                                getItemLookup2(data.getStringExtra("SCANCODE"),upcType,getstoreId,false,"0");
+                            }
+                        }
+                    }
             }
-        } else {
+        } else if (result.getContents()!=null &&result.getContents().length()<5){
+                Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+                getReceipt(result.getContents(),getstoreId);
+        }
+        else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
-
-    public void getItemLookup2(String scanCode, String upcType,String storeid) {
+    public void getItemLookup2(String scanCode, String upcType,String storeid,Boolean isWeight, String scanWt) {
         Service2 apiService = NetworkManager.createRetrofit().create(Service2.class);
         apiService.getItem(scanCode,upcType,storeid)
                 .subscribeOn(Schedulers.io())
@@ -208,9 +394,20 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
                             if(itemBaseResponse.getResponse()!=null){
 
                             Toast.makeText(CartActivity.this, itemBaseResponse.getResponse().getExtDescription(), Toast.LENGTH_SHORT).show();
-                           ItemRequest itemRequest = new ItemRequest(itemBaseResponse.getResponse().getItemId(),1,"upca",false);
-                            addItemToCart("default",itemRequest,"9879",getguid);
+
+                           if(isWeight){
+                               ItemRequest itemRequest= new  ItemRequest(itemBaseResponse.getResponse().getItemId(),Double.valueOf(scanWt),upcType,0,scanCode);
+                               addItemToCart("default",itemRequest,getstoreId,getguid);
+                           }else{
+
+                               ItemRequest itemRequest=   new ItemRequest(itemBaseResponse.getResponse().getItemId(),1,upcType,scanCode,false);
+                               addItemToCart("default",itemRequest,getstoreId,getguid);
+                           }
+                            //addItemToCart("default",itemRequest,getstoreId,getguid);
                         }
+                            if(itemBaseResponse.getAck().equals("1")){
+                                Toast.makeText(CartActivity.this, itemBaseResponse.getErrorMessage().get(0).getMessage(), Toast.LENGTH_LONG).show();
+                            }
                         } catch (NullPointerException e) {
                             e.printStackTrace();
                             Log.d(TAG, "onNext: countError"+ e.getMessage());
@@ -234,9 +431,9 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
                 });
     }
 
-    public void addItemToCart(String scanCode, ItemRequest upcType, String storeid,String guid) {
+    public void addItemToCart(String scanCode, ItemRequest itemRequest, String storeid,String guid) {
         Service2 apiService = NetworkManager.createRetrofit().create(Service2.class);
-        apiService.addItemToCart(scanCode,upcType,storeid,guid)
+        apiService.addItemToCart(scanCode,itemRequest,storeid,guid)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<BaseResponse>() {
@@ -252,11 +449,19 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
                             //  Log.d(TAG, "onNext: Button press"+data.getData().getItemCount());
 //                            itemCount = data.getData().getItemCount();
 //                            tv_TotalQuantity.setText(String.valueOf(itemCount));
-                            Toast.makeText(CartActivity.this, "Added", Toast.LENGTH_SHORT).show();
-                            viewCart(getguid,storeid,getOrderId);
-                          //  viewCartItem("default",storeid);
+//                            Toast.makeText(CartActivity.this, "Added", Toast.LENGTH_SHORT).show();
+                            //Todo check prod response time
+                            final Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    viewCart(getguid,storeid);
+                                }
+                            }, 800);
+
                         } catch (NullPointerException e) {
                             e.printStackTrace();
+                            loadingLayout.setVisibility(View.GONE);
                             Log.d(TAG, "onNext: countError"+ e.getMessage());
                         }
 //
@@ -267,6 +472,7 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
 //                        LogUtil.printLogMessage("error response", t.getMessage());
                         Log.d(TAG, "handleError: error"+ t.toString());
                         Toast.makeText(CartActivity.this, "Error add", Toast.LENGTH_SHORT).show();
+                        loadingLayout.setVisibility(View.GONE);
 //                        progressDialog.dismiss();
 //                        tvName.setText("error :   " + t.getMessage());
                     }
@@ -279,8 +485,8 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
     }
 
     public void removeItems(ItemIdRequest itemIdRequest, String storeId,String guid, String orderId, Boolean add){
-        Service apiService = NetworkManager.createRetrofit().create(Service.class);
-        apiService.deleteItemFromCart(itemIdRequest,storeId,guid,orderId,add)
+        Service2 apiService = NetworkManager.createRetrofit().create(Service2.class);
+        apiService.deleteItemsFromCart(orderId,itemIdRequest,storeId,guid)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new CompletableObserver() {
@@ -296,22 +502,22 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
                         itemRemoved = true;
                         needRecalculate =true;
 
-                        viewCart(getguid,storeId, getOrderId);
+                        viewCart(getguid,storeId);
                         loadingLayout.setVisibility(View.VISIBLE);
                         // getCheckout2(getstoreId,getguid,getguid);
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
+                        Toast.makeText(CartActivity.this, "Error Deleting", Toast.LENGTH_SHORT).show();
                     }
                 });
 
     }
 
-    public void viewCart(String guid, String storeid, String orderId) {
+    public void viewCart(String guid, String storeid) {
         Service2 apiService = NetworkManager.createRetrofit().create(Service2.class);
-        apiService.getCart(guid,storeid,orderId)
+        apiService.getCart(guid,storeid)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<BaseResponse<Cart>>() {
@@ -324,20 +530,23 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
                     public void onNext(BaseResponse<Cart> cartBaseResponse) {
 
                         try {
-                            checkoutLayout.setVisibility(View.VISIBLE);
-                            if(itemRemoved){
-                                cartTotal.setText("Checkout for total");
-                            }else{
+//                            checkoutLayout.setVisibility(View.VISIBLE);
+                            //TODO Check logic
+//                            if(itemRemoved){
+//                                cartTotal.setText("Checkout for total");
+//                            }else{
                                 cartTotal.setText("Total: $"+String.format("%.2f",cartBaseResponse.getResponse().getTotalPrice()));
-                            }
+
+                          //  }
 
                             estTotal = String.valueOf(cartBaseResponse.getResponse().getTotalPrice());
-                            Toast.makeText(CartActivity.this, "ViewCart", Toast.LENGTH_SHORT).show();
+                        //    Toast.makeText(CartActivity.this, "ViewCart", Toast.LENGTH_SHORT).show();
                             handleResultsCart(cartBaseResponse.getResponse().getData());
                             loadingLayout.setVisibility(View.GONE);
                         } catch (NullPointerException e) {
                             e.printStackTrace();
                             Log.d(TAG, "onNext: countError"+ e.getMessage());
+                            loadingLayout.setVisibility(View.GONE);
                         }
 //
                     }
@@ -349,6 +558,7 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
                         Toast.makeText(CartActivity.this, "Error add", Toast.LENGTH_SHORT).show();
 //                        progressDialog.dismiss();
 //                        tvName.setText("error :   " + t.getMessage());
+                        loadingLayout.setVisibility(View.GONE);
                     }
 
                     @Override
@@ -358,13 +568,88 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
                 });
     }
 
+    //initiate adapter
+    private void initAdapter() {
+        cartRecyclerViewAdapter.setCartActivity(this);
+//        cartItemAdapter.setHomeActivityViewModel(homeActivityViewModel);
+//        if (fragmentHomeBinding.cartLayout != null) {
+//            int space = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 108,
+//                    getResources().getDisplayMetrics());
+//            fragmentHomeBinding.cartLayout.itemRecyclerView.addItemDecoration(new SpaceItemDecoration(space));
+//            fragmentHomeBinding.cartLayout.itemRecyclerView.setHasFixedSize(true);
+//            fragmentHomeBinding.cartLayout.itemRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+//            fragmentHomeBinding.cartLayout.itemRecyclerView.setAdapter(cartItemAdapter);
+//        }
+
+    }
+
     private void handleResultsCart(List<Items> items) {
         this.itemList = items;
-
+        //TODO Setting guid for adapter, needs clean up AFTER MVVM move logic to ViewModel
+        try {
+            if(items.size()!=0){
+            items.get(0).setGuid(getguid);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         cartRecyclerViewAdapter.setData(items);
         cartRecyclerViewAdapter.notifyDataSetChanged();
-        Toast.makeText(this, "ViewCarts", Toast.LENGTH_SHORT).show();
 
+      //  Toast.makeText(this, "ViewCartsResult", Toast.LENGTH_SHORT).show();
+
+    }
+
+    public void checkoutCart(String storeId, String guid, String clubCard_nbr ) {
+        Service2 apiService = NetworkManager.createRetrofit().create(Service2.class);
+        apiService.checkoutCart(storeId,guid,clubCard_nbr)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .delay(6000,TimeUnit.MILLISECONDS)
+                .subscribe(new Observer<BaseResponse<CheckoutResponse>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.d(TAG, "onSubscribe: ");
+                    }
+
+                    @Override
+                    public void onNext(BaseResponse<CheckoutResponse> checkoutResponse) {
+
+                        try {
+                            //  Log.d(TAG, "onNext: Button press"+data.getData().getItemCount());
+//                            itemCount = data.getData().getItemCount();
+//                            tv_TotalQuantity.setText(String.valueOf(itemCount));if
+                            if(checkoutResponse.getResponse()!=null){
+                                itemRemoved = false;
+                                getReceiptSnP(checkoutResponse.getResponse().getOrderId());
+
+
+                            }
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
+                            Log.d(TAG, "onNext: countError"+ e.getMessage());
+                        }
+//
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+//                        LogUtil.printLogMessage("error response", t.getMessage());
+                        Log.d(TAG, "handleError: error"+ t.toString());
+                        try {
+                            Toast.makeText(CartActivity.this, "Error Receipt "+ t.getMessage(), Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+//                        progressDialog.dismiss();
+//                        tvName.setText("error :   " + t.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG, "onComplete: ");
+                    }
+                });
     }
 
     public void getCheckout(String storeId, String guid, String clubCard_nbr, String orderId ) {
@@ -439,7 +724,7 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
 //                            itemCount = data.getData().getItemCount();
 //                            tv_TotalQuantity.setText(String.valueOf(itemCount));if
                             if(checkoutResponse.getResponse()!=null){
-                                viewCart(getguid,getstoreId,getOrderId);
+                                viewCart(getguid,getstoreId);
                             }
                         } catch (NullPointerException e) {
                             e.printStackTrace();
@@ -467,13 +752,98 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
     public void checkoutDemo(){
         Toast.makeText(CartActivity.this, "Terminal: "+"123",Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(getBaseContext(),MainActivity.class);
-        intent.putExtra("checkoutTotal","7.52");
-        intent.putExtra("subTotal","7.77");
-        intent.putExtra("taxTotal","1.00");
-        intent.putExtra("appliedDiscountsTotal","1.15");
-        intent.putExtra("ebtTotal","7.77");
+        intent.putExtra("checkoutTotal","9.02");
+        intent.putExtra("subTotal","9.57");
+        intent.putExtra("taxTotal","0.50");
+        intent.putExtra("appliedDiscountsTotal","1.00");
+        intent.putExtra("ebtTotal","9.57");
         intent.putExtra("receipt","\\r\\n                                      \\r\\nTHANKS FOR SHOPPING SAFEWAY U CHECKOUT\\r\\n\\r\\n        SIG COFFEE COLD         1.99 S\\r\\n        CRV SFTDK SNGL NTX      0.05 S\\r\\n        TAX                     0.00  \\r\\n   **** BALANCE                 2.04  \\r\\n                                      \\r\\n06/05/20 03:06 9879 196 878 8833      \\r\\n                                      \\r\\n--------------------------------------\\r\\nYOUR CASHIER TODAY WAS SCAN AND GO    \\r\\n--------------------------------------\\r\\n--------------------------------------\\r\\n Valued Customer                491211\\r\\n--------------------------------------\\r\\n   HOW WAS YOUR SHOPPING EXPERIENCE?  \\r\\n        WE VALUE YOUR FEEDBACK!       \\r\\n   ENTER TO WIN A $100.00 GIFT CARD   \\r\\nGO TO: www.safeway.com/survey         \\r\\n    ENTER THE SURVEY CODE BELOW:      \\r\\n        987906/0503:06196/878         \\r\\n    Thank you for shopping Safeway    \\r\\nFor just for U or Rewards questions\\r\\n   call 877-276-9637 or Safeway.com   \\r\\n                                      \\r\\n***                               ***\\r\\n\", \"order_id\" : \"6520\", \"suspend_barcode_value\" : \"100019600878\", \"suspendReceiptTrailer\" : \"\\r\\n                                      \\r\\n06/05/20 03:06 9879 196 878 8833      \\r\\n                                      \\r\\n--------------------------------------\\r\\nYOUR CASHIER TODAY WAS SCAN AND GO    \\r\\n--------------------------------------\\r\\n--------------------------------------\\r\\n Valued Customer                491211\\r\\n--------------------------------------\\r\\n   HOW WAS YOUR SHOPPING EXPERIENCE?  \\r\\n        WE VALUE YOUR FEEDBACK!       \\r\\n   ENTER TO WIN A $100.00 GIFT CARD   \\r\\nGO TO: www.safeway.com/survey         \\r\\n    ENTER THE SURVEY CODE BELOW:      \\r\\n        987906/0503:06196/878         \\r\\n    Thank you for shopping Safeway    \\r\\nFor just for U or Rewards questions\\r\\n   call 877-276-9637 or Safeway.com   \\r\\n                                      \\r\\n***                               ***\"");
         startActivity(intent);
+    }
+
+    public void getReceiptSnP(String orderId) {
+        Service2 apiService = NetworkManager.createRetrofit().create(Service2.class);
+        apiService.getReceiptSnP(orderId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .repeatWhen(completed -> Observable.interval(2, TimeUnit.SECONDS))
+                .takeUntil(receiptResponse -> (receiptResponse.getErrorMessage() == null && (receiptResponse.getResponse().getTransaction_status().equals("PAYMENT PENDING")))
+                ||receiptResponse.getErrorMessage().get(0).getCode().equals("5001"))
+                .subscribe(new Observer<BaseResponse<ReceiptResponse>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.d(TAG, "onSubscribe: ");
+                    }
+
+                    @Override
+                    public void onNext(BaseResponse<ReceiptResponse> receiptResponse) {
+
+                        try {
+                            //  Log.d(TAG, "onNext: Button press"+data.getData().getItemCount());
+//                            itemCount = data.getData().getItemCount();
+//                            tv_TotalQuantity.setText(String.valueOf(itemCount));if
+
+                            if(receiptResponse.getResponse()!=null ){
+                                if(receiptResponse.getResponse().getTransaction_status().equals("PAYMENT PENDING") ) {
+
+                               /* Toast.makeText(CartActivity.this, "Terminal: "+receiptResponse.getResponse().getData().getTerminalNumber(), Toast.LENGTH_SHORT).show();
+
+                                Intent intent = new Intent(getBaseContext(),MainActivity.class);
+                                intent.putExtra("checkoutTotal",receiptResponse.getResponse().getData().getReceiptJson().getReceiptTotalResult().getTotal().toString());
+                                intent.putExtra("subTotal",receiptResponse.getResponse().getData().getReceiptJson().getReceiptTotalResult().getSubTotal().toString());
+                                intent.putExtra("taxTotal",receiptResponse.getResponse().getData().getReceiptJson().getReceiptTotalResult().getTax().toString());
+                                intent.putExtra("appliedDiscountsTotal",receiptResponse.getResponse().getData().getReceiptJson().getReceiptTotalResult().getTotalSavings().toString());
+                                intent.putExtra("ebtTotal",receiptResponse.getResponse().getData().getReceiptJson().getReceiptTotalResult().getEbt().toString());
+                                startActivity(intent);*/
+
+                                    Toast.makeText(CartActivity.this, "Terminal: " + receiptResponse.getResponse().getTerminal_number(), Toast.LENGTH_SHORT).show();
+
+                                    Intent intent = new Intent(getBaseContext(), MainActivity.class);
+
+                                    intent.putExtra("checkoutTotal", receiptResponse.getResponse().getReceiptJson().getReceiptTotalResult().getTotal().toString());
+                                    intent.putExtra("subTotal", receiptResponse.getResponse().getReceiptJson().getReceiptTotalResult().getSubTotal().toString());
+                                    intent.putExtra("taxTotal", receiptResponse.getResponse().getReceiptJson().getReceiptTotalResult().getTax().toString());
+                                    intent.putExtra("appliedDiscountsTotal", receiptResponse.getResponse().getReceiptJson().getReceiptTotalResult().getTotalSavings().toString());
+                                    intent.putExtra("ebtTotal", receiptResponse.getResponse().getReceiptJson().getReceiptTotalResult().getEbt().toString());
+                                    intent.putExtra("recalculation", "false");
+                                    intent.putExtra("orderId", receiptResponse.getResponse().getOrderId().toString());
+                                    intent.putExtra("storeId",receiptResponse.getResponse().getStoreId().toString());
+                                    intent.putExtra("clubcard",receiptResponse.getResponse().getGuid().toString());
+                                    intent.putExtra("receipt", receiptResponse.getResponse().getReceipt());
+
+                                    startActivity(intent);
+                                    loadingLayout.setVisibility(View.GONE);
+                                    loadingCheckoutText.setVisibility(View.GONE);
+                                }else if (receiptResponse.getErrorMessage().get(0).getCode().equals("5001")){
+                                    loadingLayout.setVisibility(View.GONE);
+                                    loadingCheckoutText.setVisibility(View.GONE);
+                                    Toast.makeText(CartActivity.this,receiptResponse.getErrorMessage().get(1).getMessage() , Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
+                            Log.d(TAG, "onNext: countError"+ e.getMessage());
+                        }
+//
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+//                        LogUtil.printLogMessage("error response", t.getMessage());
+                        Log.d(TAG, "handleError: error"+ t.toString());
+                        Toast.makeText(CartActivity.this, "Error Receipt "+ t.getMessage(), Toast.LENGTH_SHORT).show();
+                        loadingLayout.setVisibility(View.GONE);
+//                        progressDialog.dismiss();
+//                        tvName.setText("error :   " + t.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+                      //  Toast.makeText(CartActivity.this, "Error Receipt Complete", Toast.LENGTH_SHORT).show();
+                        loadingLayout.setVisibility(View.GONE);
+                        Log.d(TAG, "onComplete: ");
+                    }
+                });
     }
 
     public void getReceipt(String orderId,String storeId) {
@@ -578,7 +948,7 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
             listOfMixedTypes.add(newList);
 
 
-            ItemIdRequest itemIdRequest = new ItemIdRequest(listOfMixedTypes);
+           ItemIdRequest itemIdRequest = new ItemIdRequest(listOfMixedTypes);
            removeItems(itemIdRequest, getstoreId, getguid, getOrderId,cartItem.getRemovedItem());
 
         } catch (Exception e) {
@@ -589,7 +959,7 @@ public class CartActivity extends Activity implements CartRecyclerViewAdapter.On
 
     @Override
     protected void onResume() {
-            viewCart(getguid,getstoreId,getOrderId);
+        viewCart(getguid,getstoreId);
         super.onResume();
     }
 

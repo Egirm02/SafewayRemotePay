@@ -32,7 +32,7 @@ public class Item {
     private Double sellPrice;
     @SerializedName("crv")
     @Expose
-    private Integer crv;
+    private Double crv;
     @SerializedName("link_code")
     @Expose
     private String linkCode;
@@ -84,6 +84,9 @@ public class Item {
     @SerializedName("removed_item")
     @Expose
     private Boolean removedItem;
+    @SerializedName("quantity")
+    @Expose
+    private int quantity;
 
     public String getId() {
         return id;
@@ -141,11 +144,11 @@ public class Item {
         this.sellPrice = sellPrice;
     }
 
-    public Integer getCrv() {
+    public Double getCrv() {
         return crv;
     }
 
-    public void setCrv(Integer crv) {
+    public void setCrv(Double crv) {
         this.crv = crv;
     }
 
@@ -279,6 +282,14 @@ public class Item {
 
     public Boolean getRemovedItem() {
         return removedItem;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
 

@@ -92,9 +92,11 @@ import com.safeway.postest.Data.model.COA_Request;
 import com.safeway.postest.Data.model.COA_Response;
 import com.safeway.postest.Data.model.FinalizeSplitTransaction;
 import com.safeway.postest.Data.model.Item;
+import com.safeway.postest.Data.model.ReceiptResponse;
 import com.safeway.postest.Data.model.SplitItem;
 import com.safeway.postest.Data.model.receipt.Data;
 import com.safeway.postest.Data.remote.Service;
+import com.safeway.postest.Data.remote.Service2;
 import com.safeway.postest.fragment.SplitBalanceFragment;
 import com.safeway.postest.fragment.SplitOptionListener;
 
@@ -196,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
     String recalculation;
     CheckBox EBT_Option, nonEBT_Option;
     RecyclerView cartRecyclerView;
-    Boolean authorizeEBT=false;
+    Boolean authorizeEBT;
     String receipt;
     String finalSubTotal,finalSavings,finalTax,finalTotal,finalEBT_Balance,final_COA;
     Long finalEBT_Balance_long;
@@ -251,7 +253,7 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
 //        cartRecyclerViewAdapter = new CartCheckoutRecyclerViewAdapter();
 //        cartRecyclerView.setAdapter(cartRecyclerViewAdapter);
 
-        String sessionId = getIntent().getStringExtra("checkoutTotal");
+        String checkoutTotal = getIntent().getStringExtra("checkoutTotal");
         String subTotalId = getIntent().getStringExtra("subTotal");
         String taxId = getIntent().getStringExtra("taxTotal");
         String appliedDiscountsId = getIntent().getStringExtra("appliedDiscountsTotal");
@@ -265,9 +267,9 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
         finalSubTotal = subTotalId;
         finalSavings = appliedDiscountsId;
         finalTax =taxId;
-        finalTotal = sessionId;
+        finalTotal = checkoutTotal;
 
-         total = Double.valueOf(sessionId);
+         total = Double.valueOf(checkoutTotal);
          tax = Double.valueOf(taxId);
          SubTotal =Double.valueOf(subTotalId);
          AppliedDiscounts =Double.valueOf(appliedDiscountsId);
@@ -1041,18 +1043,18 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
         ll_EBTprocessed_payment.setVisibility(View.VISIBLE);
         tv_ebtProcessedPaymentAmount.setText("$ "+String.format("%.2f",Double.valueOf(EBT_PaidAmount))+" ");
 
-        if(total>0){
-            if(EBT==0) {
+        if (total > 0) {
+            if (EBT == 0) {
                 payButton.setText("Complete Pay");
                 balanceEFTRemaining = true;
-                processTransactionEBT(card_pan_print, cardType, approval_number, ebtFlag, transaction_complete_time, EBT_PaidAmount,EBTpaid);
-                orderProcessed=true;
+                processTransactionEBT(card_pan_print, cardType, approval_number, ebtFlag, transaction_complete_time, EBT_PaidAmount, EBTpaid);
+                orderProcessed = true;
             }
 //                String  amountNew =  String.valueOf(EBTpaid);
 //                String time = String.valueOf(transaction_complete_time);
 //                Transactions EBTtransaction = new Transactions(card_pan_print,cardType,approval_number,amountNew,ebtFlag,time);
 //                //transactionInfoListEBTnew = EBTtransaction;
-             //   allTransactionsList.add(EBTtransaction);
+            //   allTransactionsList.add(EBTtransaction);
 //                try {
 //                    if(recalculation.equals("true")){
 //
@@ -1065,12 +1067,12 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
 //                } catch (Exception e) {
 //                    e.printStackTrace();
 //                }
-          //  }
+            //  }
 
-            else{
+            else {
                 payButton.setText("Complete Pay");
-                processTransactionEBT(card_pan_print, cardType, approval_number, ebtFlag, transaction_complete_time, EBT_PaidAmount,EBTpaid);
-                orderProcessed=true;
+                processTransactionEBT(card_pan_print, cardType, approval_number, ebtFlag, transaction_complete_time, EBT_PaidAmount, EBTpaid);
+                orderProcessed = true;
                 //EBTCHANGE FLAG
                 balanceEFTRemaining = true;
 //                //TODO ADD THIS AMOUNT TO ARRAY
@@ -1083,11 +1085,11 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
 //                    RecalculateTransaction recalculate = new RecalculateTransaction(orderId, transactions);
 //                    loadingLayout.setVisibility(View.VISIBLE);
 //                    recalculateEBT(recalculate);
-                }
+            }
 //
 //
 //            }
-        }else if(total<0){
+        } else if (total < 0) {
 //            Date currentTime = Calendar.getInstance().getTime();
 //            String time = String.valueOf(currentTime);
 //            String currentAmount = String.valueOf(total);
@@ -1100,8 +1102,7 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
             payButton.setVisibility(View.GONE);
             rl_COA.setVisibility(View.VISIBLE);
             COA = true;
-        }
-        else {
+        } else {
 //            String  amountNew =  String.valueOf(EBTpaid);
 //            String time = String.valueOf(transaction_complete_time);
 //            if(recalculation.equals("true")) {
@@ -1112,11 +1113,17 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
 //                recalculateEBT(recalculate);
 //            }
             //TODO ADD FINAL RECIPT
-            processTransactionEBT(card_pan_print,  cardType,  approval_number, ebtFlag, transaction_complete_time,EBT_PaidAmount,EBTpaid);
+            processTransactionEBT(card_pan_print, cardType, approval_number, ebtFlag, transaction_complete_time, EBT_PaidAmount, EBTpaid);
             payButton.setVisibility(View.GONE);
-            amountTax.setText("$ "+String.format("%.2f", 0.00)+" ");
-            amountAppliedDiscounts.setText("$ "+"("+String.format("%.2f",0.00)+")");
+            amountTax.setText("$ " + String.format("%.2f", 0.00) + " ");
+            amountAppliedDiscounts.setText("$ " + "(" + String.format("%.2f", 0.00) + ")");
             printReceipt.setVisibility(View.VISIBLE);
+
+            FinalizeSplitTransaction finalizeSplitTransaction = new FinalizeSplitTransaction(orderId,allTransactionsList);
+            finalizeTransaction(finalizeSplitTransaction, storeId);
+            loadingLayout.setVisibility(View.VISIBLE);
+            amountEBT.setText("$ "+String.format("%.2f",0.00)+" ");
+            orderProcessed = false;
         }
     }
 
@@ -1136,6 +1143,7 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
         Transactions EBTtransactionFinalize = new Transactions(card_pan_print, cardType, approval_number, amountNewFinalize, ebtFlag, time);
 
         allTransactionsList.add(EBTtransactionFinalize);
+
     }
 
     private void handleEFTPaymentResponse(String card_pan_print,String cardType,String approval_number, long amount, Boolean ebtFlag,long transaction_complete_time){
@@ -1191,7 +1199,7 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
 
            // List<Transactions> transactions = allTransactionsList;
             FinalizeSplitTransaction finalizeSplitTransaction = new FinalizeSplitTransaction(orderId,allTransactionsList);
-            finalizeTransaction(finalizeSplitTransaction);
+            finalizeTransaction(finalizeSplitTransaction, storeId);
             loadingLayout.setVisibility(View.VISIBLE);
             payButton.setVisibility(View.GONE);
             amountTax.setText("$ "+String.format("%.2f", 0.00)+" ");
@@ -1522,9 +1530,9 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
                 });
     }
 
-    public void finalizeTransaction(FinalizeSplitTransaction  finalizeSplitTransaction) {
-        Service apiService = NetworkManager.createRetrofit().create(Service.class);
-        apiService.finalizeCall(finalizeSplitTransaction)
+    public void finalizeTransaction(FinalizeSplitTransaction  finalizeSplitTransaction, String storeId ) {
+        Service2 apiService = NetworkManager.createRetrofit().create(Service2.class);
+        apiService.finalizeCallSnP(finalizeSplitTransaction, storeId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<BaseResponse>() {
@@ -1671,20 +1679,20 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
     }
 
     public void getReceipt2(String orderId, String storeId) {
-        Service apiService = NetworkManager.createRetrofit().create(Service.class);
-        apiService.getReceipt(orderId, storeId)
+        Service2 apiService = NetworkManager.createRetrofit().create(Service2.class);
+        apiService.getReceiptSnP(orderId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .repeatWhen(completed -> Observable.interval(2, TimeUnit.SECONDS))
-                .takeUntil(receiptResponse -> receiptResponse.getErrorMessage() == null&& receiptResponse.getResponse().getTransactionStatus().equals("TRANSACTION COMPLETED"))
-                .subscribe(new Observer<BaseResponse<Data>>() {
+                .takeUntil(receiptResponse -> receiptResponse.getErrorMessage() == null&& receiptResponse.getResponse().getTransaction_status().equals("TRANSACTION COMPLETED"))
+                .subscribe(new Observer<BaseResponse<ReceiptResponse>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         Log.d(TAG, "onSubscribe: ");
                     }
 
                     @Override
-                    public void onNext(BaseResponse<Data> receiptResponse) {
+                    public void onNext(BaseResponse<ReceiptResponse> receiptResponse) {
 
                         try {
                             //  Log.d(TAG, "onNext: Button press"+data.getData().getItemCount());
@@ -1711,7 +1719,7 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
 //
 //                                startActivity(intent);
                                 receipt =  receiptResponse.getResponse().getReceipt();
-                                if(receiptResponse.getResponse().getTransactionStatus().equals("TRANSACTION COMPLETED")){
+                                if(receiptResponse.getResponse().getTransaction_status().equals("TRANSACTION COMPLETED")){
                                     finalSubTotal = receiptResponse.getResponse().getReceiptJson().getReceiptTotalResult().getSubTotal().toString();
                                     finalSavings = receiptResponse.getResponse().getReceiptJson().getReceiptTotalResult().getTotalSavings().toString();
                                     finalTax = receiptResponse.getResponse().getReceiptJson().getReceiptTotalResult().getTax().toString();
@@ -1724,6 +1732,8 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
                                     Toast.makeText(MainActivity.this, "Receipt updated", Toast.LENGTH_SHORT).show();
                                     payButton.setVisibility(View.GONE);
                                     rl_COA.setVisibility(View.GONE);
+
+
                                     if(COA){
                                         COA = false;
                                         printReceipt.setVisibility(View.VISIBLE);
@@ -1742,6 +1752,32 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
                                         rl_COA.setVisibility(View.GONE);
 
                                     }
+                                }else{
+                                    if(total>0){
+                                        payButton.setVisibility(View.VISIBLE);
+//                                    amountTax.setText("$ "+String.format("%.2f", 0.00)+" ");
+//                                    amountAppliedDiscounts.setText("$ "+"("+String.format("%.2f",0.00)+")");
+                                        printReceipt.setVisibility(View.GONE);
+                                        orderProcessed=true;
+                                        payButton.setText("Complete Pay");
+                                        //EBTCHANGE FLAG
+                                        // if(EBT==0){balanceEFTRemaining = true;}else {}
+                                        //EBTCHANGE
+                                        balanceEFTRemaining = true;
+                                    }
+                                }
+                                receipt =  receiptResponse.getResponse().getReceipt();
+                                    //todo check to see if we get balanceDue
+                               /* total = receiptResponse.getResponse().getReceiptJson().getReceiptTotalResult().getBalanceDue();
+                                amountET.setText("$ "+String.format("%.2f", total));*/
+
+                               // recalculation = String.valueOf(receiptResponse.getResponse().getIsRecalculationNeeded());
+                                EBT = receiptResponse.getResponse().getReceiptJson().getReceiptTotalResult().getEbt();
+                                ebt_recalcualted = true;
+                                Toast.makeText(MainActivity.this, "Receipt updated", Toast.LENGTH_SHORT).show();
+                                if((receiptResponse.getResponse().getTransaction_status().equals("TRANSACTION RECALCULATED")||
+                                        receiptResponse.getResponse().getTransaction_status().equals("TRANSACTION COMPLETED"))){
+                                    loadingLayout.setVisibility(View.GONE);
                                 }
 
 
@@ -1806,7 +1842,7 @@ public class MainActivity extends AppCompatActivity implements SplitOptionListen
                                     List<Transactions> transactions = Collections.singletonList(transactionsCOA);
 
                                     FinalizeSplitTransaction finalizeSplitTransaction = new FinalizeSplitTransaction(orderId,transactions);
-                                    finalizeTransaction(finalizeSplitTransaction);
+                                    finalizeTransaction(finalizeSplitTransaction,storeId);
                                 }else{
                                     Toast.makeText(MainActivity.this, "Error COA, Order Id incorrect please try again", Toast.LENGTH_SHORT).show();
                                 }

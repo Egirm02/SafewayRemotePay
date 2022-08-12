@@ -1,12 +1,15 @@
 package com.safeway.postest;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -18,9 +21,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +42,7 @@ import com.safeway.postest.Data.model.receipt.Data;
 import com.safeway.postest.Data.model.receipt.Receipt;
 import com.safeway.postest.Data.model.retreaveOrder.Data3;
 import com.safeway.postest.Data.remote.Service;
+import com.safeway.postest.Data.remote.Service2;
 
 import java.util.concurrent.TimeUnit;
 
@@ -43,15 +50,19 @@ import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.internal.observers.BlockingBaseObserver;
 import io.reactivex.schedulers.Schedulers;
 
 import static android.content.ContentValues.TAG;
 
 public class Home extends AppCompatActivity {
-    Button startNewTransaction, recallTransaction, showClubCard, scanClubCard;
+    Button startNewTransaction, scanClubCard;
     FrameLayout clubCardlayout;
-    TextView manualEntryTitle;
+    TextView manualEntryTitle,recallTransaction;
+    LinearLayout ll_guest_checkout;
+    CardView showClubCard;
     TextView welcomeUserName;
+    ImageView closeCCPhoneView;
     EditText etClubcard;
     EditText etStoreId;
     String retrieveOrder;
@@ -70,9 +81,11 @@ public class Home extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        startNewTransaction = findViewById(R.id.btn_StartNew);
-        recallTransaction = findViewById(R.id.btn_RecallTransaction);
-        showClubCard = findViewById(R.id.btn_show_club_card);
+     //   startNewTransaction = findViewById(R.id.btn_StartNew);
+      //  recallTransaction = findViewById(R.id.tv_RecallTransaction);
+        ll_guest_checkout = findViewById(R.id.ll_guest_checkout);
+        showClubCard = findViewById(R.id.cv_enter_cc);
+        closeCCPhoneView = findViewById(R.id.iv_close_cc_phone_option);
         scanClubCard = findViewById(R.id.btn_Scan_club_card);
         clubCardlayout = findViewById(R.id.fl_club_card);
         etClubcard = findViewById(R.id.et_retreave_transaction);
@@ -82,44 +95,58 @@ public class Home extends AppCompatActivity {
         welcomeUserName = findViewById(R.id.tv_welcomeTextView);
         etStoreId = findViewById(R.id.et_storeId);
 
-        startNewTransaction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getBaseContext(), CartActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        recallTransaction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+//        startNewTransaction.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
 //                Intent intent = new Intent(getBaseContext(), CartActivity.class);
 //                startActivity(intent);
-                //Real
-//                if (etStoreId.getText().toString().equals("")) {
-//                    Toast.makeText(Home.this, "Please set store number first", Toast.LENGTH_SHORT).show();
-//                } else {
-//                    IntentIntegrator integrator = new IntentIntegrator(Home.this);
-//                    integrator.setCaptureActivity(CaptureActivityPortrait.class);
-//                    integrator.setOrientationLocked(false);
-//                    integrator.initiateScan();
+//            }
+//        });
+
+      //  recallTransaction.setOnClickListener(new View.OnClickListener() {
+//        ll_guest_checkout.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+////                Intent intent = new Intent(getBaseContext(), CartActivity.class);
+////                startActivity(intent);
+//                //Real
+////                if (etStoreId.getText().toString().equals("")) {
+////                    Toast.makeText(Home.this, "Please set store number first", Toast.LENGTH_SHORT).show();
+////                } else {
+////                    IntentIntegrator integrator = new IntentIntegrator(Home.this);
+////                    integrator.setCaptureActivity(CaptureActivityPortrait.class);
+////                    integrator.setOrientationLocked(false);
+////                    integrator.initiateScan();
+////                }
+//                //Demo
+////                String retrieve = "100019900017" ;// result.getContents().toString();
+////                if(retrieve.length()> 12){
+////                    retrieveOrder(retrieve.substring(0,12),etStoreId.getText().toString());
+////                }else{retrieveOrder(retrieve,etStoreId.getText().toString());}
+////                    loadingLayout.setVisibility(View.VISIBLE);
+//                //Demo2
+//                loadingLayout.setVisibility(View.GONE);
+//               // Toast.makeText(Home.this, "Terminal: " + receiptResponse.getResponse().getTerminalNumber(), Toast.LENGTH_SHORT).show();
+//                if(etStoreId.getText().toString().equals("")){
+//                    Toast.makeText(this,"Please enter store number first", Toast.LENGTH_LONG).show();
+//                }if(etStoreId.getText().length()<4){
+//                    Toast.makeText(this,"Please enter full store number first", Toast.LENGTH_LONG).show();
+//                    Toast.makeText(this, "Please enter store number", Toast.LENGTH_SHORT).show();
 //                }
-                //Demo
-//                String retrieve = "100019900017" ;// result.getContents().toString();
-//                if(retrieve.length()> 12){
-//                    retrieveOrder(retrieve.substring(0,12),etStoreId.getText().toString());
-//                }else{retrieveOrder(retrieve,etStoreId.getText().toString());}
-//                    loadingLayout.setVisibility(View.VISIBLE);
-                //Demo2
-                loadingLayout.setVisibility(View.GONE);
-               // Toast.makeText(Home.this, "Terminal: " + receiptResponse.getResponse().getTerminalNumber(), Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getBaseContext(), CartActivity.class);
-                intent.putExtra("guid", "100-167-1565301748025");
-                intent.putExtra("storeId", "9879");
-                intent.putExtra("orderId", "00");
-                startActivity(intent);
-            }
-        });
+//                else{
+//                storeId = etStoreId.getText().toString();
+//                Util.saveString(Home.this, Util.STORE_ID,  storeId);
+//
+//                Intent intent = new Intent(getBaseContext(), CartActivity.class);
+//                intent.putExtra("guid", "100-167-1565301748025");
+//                intent.putExtra("storeId", "9879");
+//                intent.putExtra("orderId", "00");
+//                startActivity(intent);
+//                }
+//            }
+//        });
+        guestCheckout();
+
         showClubCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -130,30 +157,121 @@ public class Home extends AppCompatActivity {
             }
         });
 
+        closeCCPhoneView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                manualEntryTitle.setVisibility(View.GONE);
+                showClubCard.setVisibility(View.VISIBLE);
+                clubCardlayout.setVisibility(View.GONE);
+            }
+        });
+
+//        btn_submit_recall.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//                if (etStoreId.getText().toString().equals("")) {
+//                    Toast.makeText(Home.this, "Please set store number first", Toast.LENGTH_SHORT).show();
+//
+//                } else {
+////                    try {
+////                        String retreave = etClubcard.getText().toString();
+////                        if (retreave.length() > 12) {
+////                            retrieveOrder(retreave.substring(0, 12), storeId);
+////                        } else {
+////                            retrieveOrder(retreave, storeId);
+////                        }
+////                        loadingLayout.setVisibility(View.VISIBLE);
+////
+////                    } catch (Exception e) {
+////                        e.printStackTrace();
+////                    }
+//
+//                    String number = etClubcard.getText().toString();
+//                    if (number.equals("3365292944")){
+//                        Toast.makeText(Home.this, "Clubcard successfully found", Toast.LENGTH_SHORT).show();
+//                        loadingLayout.setVisibility(View.GONE);
+//                        // Toast.makeText(Home.this, "Terminal: " + receiptResponse.getResponse().getTerminalNumber(), Toast.LENGTH_SHORT).show();
+//                        Intent intent = new Intent(getBaseContext(), CartActivity.class);
+//                        intent.putExtra("guid", "100-167-1565301748025");
+//                        intent.putExtra("storeId", "9879");
+//                        intent.putExtra("orderId", "00");
+//                        startActivity(intent);
+//
+//                    }
+//                    else{
+//                    AlertDialog alertDialog = new AlertDialog.Builder(Home.this).create();
+//                    alertDialog.setTitle("Notice");
+//                    alertDialog.setMessage("This number is not associated with a ClubCard.\n\n" +
+//                            "Please try a different number or use the Guest Checkout.");
+//                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+//                            new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    dialog.dismiss();
+//                                }
+//                            });
+//                    alertDialog.show();
+//                    }
+//                }
+//            }
+//        });
+
         btn_submit_recall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 if (etStoreId.getText().toString().equals("")) {
                     Toast.makeText(Home.this, "Please set store number first", Toast.LENGTH_SHORT).show();
-                } else {
-                    try {
-                        String retreave = etClubcard.getText().toString();
-                        if (retreave.length() > 12) {
-                            retrieveOrder(retreave.substring(0, 12), storeId);
-                        } else {
-                            retrieveOrder(retreave, storeId);
-                        }
-                        loadingLayout.setVisibility(View.VISIBLE);
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                } else {
+//                    try {
+//                        String retreave = etClubcard.getText().toString();
+//                        if (retreave.length() > 12) {
+//                            retrieveOrder(retreave.substring(0, 12), storeId);
+//                        } else {
+//                            retrieveOrder(retreave, storeId);
+//                        }
+//                        loadingLayout.setVisibility(View.VISIBLE);
+//
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+
+                    String cc_PhoneNumber = etClubcard.getText().toString();
+
+                    storeIdCheck();
+
+                    if (cc_PhoneNumber.length()>9){
+                        loadingLayout.setVisibility(View.VISIBLE);
+                        validPhoneCheck(cc_PhoneNumber);
+                       // Toast.makeText(Home.this, "Clubcard successfully found", Toast.LENGTH_SHORT).show();
+                        // Toast.makeText(Home.this, "Terminal: " + receiptResponse.getResponse().getTerminalNumber(), Toast.LENGTH_SHORT).show();
+//                        Intent intent = new Intent(getBaseContext(), CartActivity.class);
+//                        intent.putExtra("guid", cc_PhoneNumber);
+//                        intent.putExtra("cc_PhoneNumber",cc_PhoneNumber);
+//                        intent.putExtra("storeId", storeId);
+//                        intent.putExtra("orderId", "00");
+//                        startActivity(intent);
+
+                    }
+                    else{
+                        AlertDialog alertDialog = new AlertDialog.Builder(Home.this).create();
+                        alertDialog.setTitle("Notice");
+                        alertDialog.setMessage("Enter a valid phone number or Club Card number.\n\n" +
+                                "Please try a different number or use the Guest Checkout.");
+                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        alertDialog.show();
                     }
                 }
             }
         });
 
-   //     userName = getIntent().getStringExtra("userName");
+   /**     userName = getIntent().getStringExtra("userName");**/
         userName = Util.getString(getApplicationContext(), Util.USER_NAME, "");
         //understand the blank
         storeId = Util.getString(getApplicationContext(), Util.STORE_ID, "");
@@ -181,6 +299,118 @@ public class Home extends AppCompatActivity {
 //        });
     }
 
+    public void
+    validPhoneCheck (String phone) {
+        Service2 apiService2 = NetworkManager.createRetrofit().create(Service2.class);
+        apiService2.getPhoneStatus(phone)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<BaseResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+
+                        if(baseResponse.getMessage().equals("valid user")){
+                            loadingLayout.setVisibility(View.GONE);
+                            // Toast.makeText(Home.this, "Terminal: " + receiptResponse.getResponse().getTerminalNumber(), Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(getBaseContext(), CartActivity.class);
+                            intent.putExtra("guid", phone);
+                            intent.putExtra("cc_PhoneNumber",phone);
+                            intent.putExtra("storeId", storeId);
+                            intent.putExtra("orderId", "00");
+                            etClubcard.setText("");
+                            startActivity(intent);
+                        } else {
+                            AlertDialog alertDialog = new AlertDialog.Builder(Home.this).create();
+                            alertDialog.setTitle("Notice");
+                            alertDialog.setMessage("Enter a valid phone number or Club Card number.\n\n" +
+                                    "Please try a different number or use the Guest Checkout.");
+                            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                            loadingLayout.setVisibility(View.VISIBLE);
+                            alertDialog.show();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        AlertDialog alertDialog = new AlertDialog.Builder(Home.this).create();
+                        alertDialog.setTitle("Notice");
+                        alertDialog.setMessage("Enter a valid phone number or Club Card number.\n\n" +
+                                "Please try a different number or use the Guest Checkout.");
+                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        hideSoftKeyBoard();
+                        loadingLayout.setVisibility(View.GONE);
+                        alertDialog.show();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private void hideSoftKeyBoard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+        if(imm.isAcceptingText()) { // verify if the soft keyboard is open
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
+    public void storeIdCheck(){
+        if(etStoreId.getText().toString().equals("")){
+            Toast.makeText(Home.this, "Please enter store number", Toast.LENGTH_SHORT).show();
+        }if(etStoreId.getText().length()<4){
+            Toast.makeText(Home.this,"Please enter full 4 digit store number first", Toast.LENGTH_LONG).show();
+        }
+        else{
+            storeId = etStoreId.getText().toString();
+            Util.saveString(Home.this, Util.STORE_ID,  storeId);
+        }
+    }
+
+    public void guestCheckout(){
+        ll_guest_checkout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                loadingLayout.setVisibility(View.GONE);
+
+                storeIdCheck();
+
+                if(etStoreId.length()>3){
+                    storeId = etStoreId.getText().toString();
+                    Util.saveString(Home.this, Util.STORE_ID,  storeId);
+                    etClubcard.setText("");
+
+                    Long tsLong = System.currentTimeMillis()/1000;
+                    String ts = tsLong.toString();
+
+                    Intent intent = new Intent(getBaseContext(), CartActivity.class);
+                    intent.putExtra("guid", "100-167-1565301748025" + "-"+ ts);
+                    intent.putExtra("storeId", storeId);
+                    intent.putExtra("orderId", "00");
+                    //todo check cc
+                    intent.putExtra("cc_PhoneNumber","3365292944");
+                    startActivity(intent);
+                }
+            }
+        });
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_home, menu);

@@ -5,20 +5,22 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         release {
-//            storeFile file('C:\\Users\\egirm02\\Desktop\\backup3\\SafeewayTest\\release.jks')
+            storeFile file('C:\\Users\\egirm02\\Desktop\\backup3\\SafeewayTest\\release.jks')
             storePassword 'eatandroid'
             keyAlias = 'release'
             keyPassword 'eatandroid'
+            v1SigningEnabled true
+            v2SigningEnabled false
        //     storeFile file('/Users/N495042/StudioProjects/SafewayRemotePay2/release.jks')
         }
     }
     compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    buildToolsVersion '29.0.3'
     defaultConfig {
         applicationId "com.safeway.postest3"
-        minSdkVersion 17
+        minSdkVersion 21
         targetSdkVersion 24
-        versionCode 24
+        versionCode 28
         versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -35,6 +37,7 @@ android {
             minifyEnabled false
             debuggable true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     dataBinding {
@@ -42,8 +45,8 @@ android {
     }
     android {
         compileOptions {
-            sourceCompatibility 1.8
-            targetCompatibility 1.8
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
         }
     }
 
@@ -64,15 +67,25 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'com.google.android.material:material:1.5.0-alpha02'
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.clover.sdk:clover-android-connector-sdk:248.4'
     implementation 'com.clover.sdk:clover-android-sdk:248.4'
 
+    //scandit
+    api "com.scandit.datacapture:core:${versions.scandit_sdk_version}"
+    api "com.scandit.datacapture:barcode:${versions.scandit_sdk_version}"
+
+   // implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}")
+   // implementation("androidx.appcompat:appcompat:${versions.androidx_appcompat}")
+   // implementation("com.google.android.material:material:${versions.material}")
+  //  implementation("androidx.constraintlayout:constraintlayout:${versions.androidx_constraintlayout}")
+  //  implementation("com.squareup.okhttp3:okhttp:${versions.okhttp}")
+
     implementation('com.journeyapps:zxing-android-embedded:4.1.0') { transitive = false }
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    //implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'com.google.zxing:core:3.3.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
@@ -84,9 +97,9 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.1.9'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'com.squareup.okhttp:okhttp:2.7.5'
+  //  implementation 'com.squareup.okhttp:okhttp:2.7.5'
     implementation 'com.google.code.gson:gson:2.4'
     implementation 'com.daimajia.swipelayout:library:1.2.0@aar'
 }

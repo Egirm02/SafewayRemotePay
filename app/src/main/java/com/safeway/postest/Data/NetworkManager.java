@@ -21,6 +21,7 @@ public class NetworkManager {
     private static OkHttpClient client;  //https://clover-payment.azure-api.net/
                                         //https://retail-api.azure-api.net/
     public static String BASE_URL = "https://retail-api.azure-api.net/";
+    public static String BASE_URL_CLOVER = "https://clover-payment.azure-api.net/";
     public static String MSGRAPH_URL ="https://graph.microsoft.com/";
 
     private NetworkManager() {
@@ -53,6 +54,18 @@ public class NetworkManager {
                 .create();
         return new Retrofit.Builder()
                 .baseUrl(BASE_URL)
+                .client(createOkHttpClient())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+    }
+
+    public static Retrofit createRetrofitClover() {
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+        return new Retrofit.Builder()
+                .baseUrl(BASE_URL_CLOVER)
                 .client(createOkHttpClient())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))

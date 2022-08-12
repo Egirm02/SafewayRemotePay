@@ -2,6 +2,7 @@ package com.safeway.postest.Data.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.safeway.postest.Data.model.receipt.ReceiptJson;
 
 import java.io.Serializable;
 
@@ -24,7 +25,7 @@ public class ReceiptResponse implements Serializable {
     private Double total_amount;
     @SerializedName(value="receipt_json")
     @Expose
-    private ReceiptJson receiptJson;
+    private com.safeway.postest.Data.model.receipt.ReceiptJson receiptJson;
     @SerializedName("guid")
     @Expose
     private String guid;
@@ -70,6 +71,11 @@ public class ReceiptResponse implements Serializable {
     @SerializedName("item_count")
     @Expose
     private Integer itemCount;
+
+    @SerializedName(value="storeId", alternate = "store_id")
+    @Expose
+    private String storeId;
+
 
 
     public String getVersion() {
@@ -162,7 +168,7 @@ public class ReceiptResponse implements Serializable {
         this.total_amount = total_amount;
     }
 
-    public ReceiptJson getReceiptJson() {
+    public com.safeway.postest.Data.model.receipt.ReceiptJson getReceiptJson() {
         return receiptJson;
     }
 
@@ -217,6 +223,14 @@ public class ReceiptResponse implements Serializable {
 
     public void setItemCount(Integer itemCount) {
         this.itemCount = itemCount;
+    }
+
+    public String getStoreId() {
+        return storeId;
+    }
+
+    public void setStoreId(String storeId) {
+        this.storeId = storeId;
     }
 
     @Override
