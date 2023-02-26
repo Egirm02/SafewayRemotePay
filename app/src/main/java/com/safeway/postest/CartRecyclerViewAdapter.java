@@ -107,25 +107,25 @@ public class CartRecyclerViewAdapter extends RecyclerView.Adapter<CartRecyclerVi
             holder.etqunt.setText(count1.toString());
         } else {
             // stepper view for upc type2 wight embedded items
-            if (cartItem.getItemId().startsWith("02")||cartItem.getItemId().startsWith("2")||cartItem.getItemId().startsWith("002")) {
-                Double count1= cartItem2.getWeight();
-                holder.etqunt.getLayoutParams().width =150;
-                holder.minus.setVisibility(View.GONE);
-                holder.plus.setVisibility(View.GONE);
-                holder.minusDisabled.setVisibility(View.VISIBLE);
-                holder.plusDisabled.setVisibility(View.VISIBLE);
-//                count= Integer.valueOf(count1.intValue());
-//                holder.etqunt.setText(count1.toString());
-                count = cartItem2.getQuantity();
-                holder.etqunt.setText(count.toString());
-            } else {
+//            if (cartItem.getItemId().startsWith("02")||cartItem.getItemId().startsWith("2")||cartItem.getItemId().startsWith("002")) {
+//                Double count1= cartItem2.getWeight();
+//                holder.etqunt.getLayoutParams().width =150;
+//                holder.minus.setVisibility(View.GONE);
+//                holder.plus.setVisibility(View.GONE);
+//                holder.minusDisabled.setVisibility(View.VISIBLE);
+//                holder.plusDisabled.setVisibility(View.VISIBLE);
+////                count= Integer.valueOf(count1.intValue());
+////                holder.etqunt.setText(count1.toString());
+//                count = cartItem2.getQuantity();
+//                holder.etqunt.setText(count.toString());
+//            } else {
                 holder.minus.setVisibility(View.VISIBLE);
                 holder.plus.setVisibility(View.VISIBLE);
                 holder.minusDisabled.setVisibility(View.GONE);
                 holder.plusDisabled.setVisibility(View.GONE);
                 count = cartItem2.getQuantity();
                 holder.etqunt.setText(count.toString());
-            }
+//            }
         }
 
             if(cartItem.getRemovedItem()!= null &&cartItem.getRemovedItem()){
